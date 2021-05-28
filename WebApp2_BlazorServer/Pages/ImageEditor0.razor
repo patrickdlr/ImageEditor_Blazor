@@ -1,0 +1,93 @@
+﻿@page "/ImageEditor0"
+<!--
+
+@using BlazorServerApp1; @*project name*@
+@using BlazorInputFile
+@using SixLabors.ImageSharp;
+@using SixLabors.ImageSharp.Formats;
+@using SixLabors.ImageSharp.Processing;
+@using SixLabors.ImageSharp.PixelFormats; @*<rgba32>*@
+@using System;
+@using System.IO;
+@using System.Numerics; @*vector4*@
+
+
+
+<h1>Image Editor</h1>
+<h3>Upload an image</h3>
+
+@*button upload an image*@
+<InputFile OnChange="HandleFileSelected_function" />
+
+@*display an image, upload status, and filter button*@
+@if (displayImage == true)
+{
+    <h5>@status</h5>
+    <img src="@_ip.getBase64String_function()" style="width:400px" />
+    <p>
+        <button class="btn btn-primary" @onclick="Filter1">filter1</button> <br />
+        <button class="btn btn-primary" @onclick="Filter2">filter2</button> <br />
+    </p>
+}
+
+@code {
+    string status;
+    string Error;
+    bool displayImage = false;
+    ImageProcessing_CS _ip;
+    Image<Rgba32> image;
+    IImageFormat IIF1;
+
+    //filter1 = replace dark colors with red color
+    void Filter1()
+    {
+        for (int w = 0; w < image.Width; w++)
+        {
+            for (int h = 0; h < image.Height; h++)
+            {
+                if (image[w, h].R < 200 && image[w, h].G < 200 && image[w, h].B < 200)
+                    image[w, h] = new Rgba32(255, image[w, h].G, image[w, h].B, image[w, h].A);
+            }
+        }
+    }
+
+    //how to add custom processing logic here?
+    void Filter2()
+    {
+        image.Mutate(c => c.ProcessPixelRowsAsVector4(row =>
+        {
+            for (int x = 0; x < row.Length; x++)
+            {
+            // We can apply any custom processing logic here
+            row[x] = Vector4.SquareRoot(row[x]);
+            }
+        }));
+    }
+
+
+
+    //uploads and initalizes image
+    async Task HandleFileSelected_function(IFileListEntry[] files)
+    {
+        var imageFile = files.FirstOrDefault();
+
+        if (imageFile != null)
+        {
+            var ms = new MemoryStream();
+            await imageFile.Data.CopyToAsync(ms);
+            try
+            {
+                image = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
+                _ip = new ImageProcessing_CS(image, IIF1);
+                displayImage = true;
+                status = $"Finished loading {imageFile.Size} bytes from {imageFile.Name}";
+            }
+            catch (Exception e)
+            {
+                Error = $"Error occured while loading image {e.Message}";
+            }
+        }
+    }
+}
+
+    -->
