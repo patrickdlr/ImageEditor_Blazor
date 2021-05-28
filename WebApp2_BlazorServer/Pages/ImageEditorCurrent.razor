@@ -1,7 +1,8 @@
 ﻿@page "/ImageEditor"
-
 @*//NOTES:
     //business-oriented sfotware dev is about making use of tools to help your business stay comopetitive. ex: implement opencv photo filter, etc.
+    ////SixLabors.ImageSharp.Formats.Png.PngFormat works with transparency
+    //SixLabors.ImageSharp.Formats.Jpeg.JpegFormat does not
 
     //LIST OF PROBLEMS
     //fix the navbar, check if huesset.com is SSL secured after 24 hours (after 10:40am 5/25) ///PROBLEM 0
@@ -10,6 +11,7 @@
     //update imgSharp_original, should get another imgSharp_original2 to make sure that the reset button works as intended ///PROBLEM3
     //resize/center photo better? off to the right, not well centered ///PROBLEM4
     //how to make gradual increase, not sudden increase throughout range //PROBLEM5*@
+
 
 @*@using BlazorInputFile; obsolate*@
 @using System;
@@ -30,23 +32,9 @@
 
 @using Microsoft.Extensions.Logging
 @inject IWebHostEnvironment Environment
-@inject IWebHostEnvironment env
 
 
 @code {
-
-    bool transparentbackgroundtf = true;
-    //void Transparentbackgroundtf_function()
-    //{
-    //    if (transparentbackgroundtf == false)
-    //    {
-    //        transparentbackgroundtf = true;
-    //    }
-    //    else
-    //    {
-    //        transparentbackgroundtf = false;
-    //    }
-    //}
 
     string status = "Sample image";
     string Error;
@@ -67,7 +55,6 @@
 
     ImageProcessing_CS _ip;
     ImageProcessing_CS _ip_original;
-    ImageProcessing_CS _ip_underneath;
     ImageProcessing_CS _ip_blank;
 
     IImageFormat IIF1;
@@ -87,12 +74,10 @@
         // Make website show uploaded/sample image upon loading
         imgSharp = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1); // imagesharp
         imgSharp_original1 = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
-        imgSharp_underneath = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1); imgSharp_underneath.Mutate(x => x.Grayscale());
         imgSharp_blank = new Image<Rgba32>(imgSharp.Width, imgSharp.Height);
 
         _ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
         _ip_original = new ImageProcessing_CS(imgSharp, IIF1);
-        _ip_underneath = new ImageProcessing_CS(imgSharp_underneath, IIF1);
         _ip_blank = new ImageProcessing_CS(imgSharp_blank, IIF1);
 
         displayImage = true;
@@ -126,33 +111,29 @@
     <p>Upload an image (NEW):</p>
     @*<InputFile OnChange="@OnInputFileChange" />*@
 
+    <InputFile OnChange="@LoadFiles" />
+    @*only available in Net 5.0, so use net 5.0 and ensure that ur fully migrated to net 5.0~!!!!*@
+
 
     @*<InputFile />
         <button type="submit">Upload Selected File(s)</button>*@
-
-    @*<InputFile @bind="LoadFiles2" />*@
-
-
-    <InputFile OnChange="@LoadFiles2" />
-    @*@bind="newHeading"*@
-    @*only available in Net 5.0, so use net 5.0 and ensure that ur fully migrated to net 5.0~!!!!*@
-
     @*<input multiple="" type="file" _bl_2="">*@
-
 </form>
-
-
 
 
 <p>Note: Uploading/editing a 4k image takes >45 seconds. For best results, use images with minimal background and high resolution.</p>
 <p>@status</p>
 
-@if (showloading == true)
-{<p style="color:greenyellow">Uploading...</p>}
-@if (showprocessing == true)
-{<p style="color:darkorange">Processing...</p>}
-@if (showerror == true)
-{<p style="color:red">@Error</p>}
+<div>
+    @if (showloading == true)
+    {<p style="color:greenyellow">Uploading...</p>}
+    @if (showprocessing == true)
+    {<p style="color:darkorange">Processing...</p>}
+    @if (showerror == true)
+    {<p style="color:red">@Error</p>}
+</div>
+
+
 <div>
     <button class="btn btn-primary" @onclick="Filter1">No Red</button>
     <button class="btn btn-primary" @onclick="Filter2">No Green</button>
@@ -176,7 +157,6 @@
     <button class="btn btn-primary" @onclick="(() => Edge(2))">Line2</button>
     <button class="btn btn-primary" @onclick="(() => Edge(3))">Line3</button>
     <button class="btn btn-primary" @onclick="(() => Edge(4))">Line4</button>
-    @*<button class="btn btn-primary" @onclick="Transparentbackgroundtf_function">Transparent background for Edge: @transparentbackgroundtf</button>*@
     <br />
 
     <button class="btn btn-primary" @onclick="Reset">Reset</button>
@@ -194,7 +174,6 @@
     <p>
         <div>
             @*<img class="image_background" src="@_ip_blank.getBase64String_function()" /> not needed*@
-            @*<img class="image_display" src="@_ip_underneath.getBase64String_function()" />*@
             <img class="image_display"
                  src="@_ip.getBase64String_function()" />
         </div>
@@ -203,13 +182,7 @@
 
 
 
-
-
-
-
 @code {
-
-
     //pixel manipulation way 1
     //(not storing variable)
     void Filter1()
@@ -907,28 +880,12 @@
     public void Dispose()
     {
     }
+
+
+
+
     string Message = "No file(s) selected";
     IReadOnlyList<IBrowserFile> selectedFiles;
-
-
-    async Task LoadFiles2(InputFileChangeEventArgs e)
-    {
-        showloading = true;
-        displayImage = false;
-        showerror = true;
-
-        Debug.WriteLine("InputFileChangeEventArgs !!!");
-
-
-        //var ms = new MemoryStream(); // blazorinputfile
-        //await e.OpenReadStream(maxFileSize).CopyToAsync(ms); // blazorinputfile
-
-
-        /*wait e.OpenReadStream(maxFileSize).CopyToAsync(ms); // blazorinputfile*/
-    }
-
-
-
 
 
     private List<IBrowserFile> loadedFiles = new();
@@ -939,7 +896,12 @@
     async Task LoadFiles(InputFileChangeEventArgs e)
 
     {
-        Debug.WriteLine("activated!!!");
+        showloading = true;
+        displayImage = false;
+        showerror = true;
+
+
+        //var imageFile = e.();
 
         foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
         {
@@ -965,14 +927,10 @@
                     IImageFormat IIF1; // imagesharp
                     imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
                     imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
-                    ///imgSharp_underneath = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
-                    ///imgSharp_underneath.Mutate(x => x.Grayscale());
-                    ///
                     imgSharp_blank = new Image<Rgba32>(imgSharp.Width, imgSharp.Height);
 
                     _ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
                     _ip_original = new ImageProcessing_CS(imgSharp, IIF1);
-                    _ip_underneath = new ImageProcessing_CS(imgSharp_underneath, IIF1);
                     _ip_blank = new ImageProcessing_CS(imgSharp_blank, IIF1);
 
 
@@ -984,8 +942,7 @@
 
                     //Debug.WriteLine(IIF1);
 
-                    //SixLabors.ImageSharp.Formats.Png.PngFormat works with transparency
-                    //SixLabors.ImageSharp.Formats.Jpeg.JpegFormat does not
+
                 }
 
 
@@ -1046,14 +1003,10 @@
     //                IImageFormat IIF1; // imagesharp
     //                imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
     //                imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
-    //                ///imgSharp_underneath = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
-    //                ///imgSharp_underneath.Mutate(x => x.Grayscale());
-    //                ///
     //                imgSharp_blank = new Image<Rgba32>(imgSharp.Width, imgSharp.Height);
 
     //                _ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
     //                _ip_original = new ImageProcessing_CS(imgSharp, IIF1);
-    //                _ip_underneath = new ImageProcessing_CS(imgSharp_underneath, IIF1);
     //                _ip_blank = new ImageProcessing_CS(imgSharp_blank, IIF1);
 
 

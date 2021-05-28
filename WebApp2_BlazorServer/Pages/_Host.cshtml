@@ -10,16 +10,25 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WebApp2_BlazorServer</title>
+    <title>Huesset</title>
     <base href="~/" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link href="css/site.css" rel="stylesheet" />
     <link href="WebApp2_BlazorServer.styles.css" rel="stylesheet" />
+
+    <!--additions-->
+    <script src="~/_content/BlazorInputFile/inputfile.js"></script>
+    <script src="_framework/blazor.server.js"></script>
+    <script>
+        Blazor.defaultReconnectionHandler._reconnectCallback = function (d) {
+            document.location.reload();
+        }
+    </script>
 </head>
 <body>
     <component type="typeof(App)" render-mode="ServerPrerendered" />
 
-    <div id="blazor-error-ui">
+    @*<div id="blazor-error-ui">
         <environment include="Staging,Production">
             An error has occurred. This application may no longer respond until reloaded.
         </environment>
@@ -28,7 +37,7 @@
         </environment>
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
-    </div>
+    </div>*@
 
     <script src="_framework/blazor.server.js"></script>
 </body>
