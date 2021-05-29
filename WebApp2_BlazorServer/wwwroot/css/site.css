@@ -1,5 +1,9 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+h1 {
+    font-size: 2em;
+    padding-top: 20px;
+}
 .center1 {
     margin: auto;
     text-align: center;

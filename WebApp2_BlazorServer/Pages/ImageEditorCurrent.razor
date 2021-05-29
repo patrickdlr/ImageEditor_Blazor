@@ -108,22 +108,21 @@
 <figure>
     <figcaption>Notes:</figcaption>
     <ul>
-
-        <li>
-            Uploading/editing a 4k image takes >45 seconds.
-        </li>
         <li>
             If using line filters, use images with high resolution and minimal background for best results.
         </li>
         <li>
-            Maximum upload file size: 10 MB.
+            Editing a large (4k) image takes >45 seconds due to performance limitations of web apps.
+        </li>
+        <li>
+            No data gets collected on this site.
         </li>
 
     </ul>
 </figure>
 
 <form>
-    <figcaption>Upload an image:</figcaption>
+    <figcaption>Upload an image (10 MB max):</figcaption>
     @*<InputFile OnChange="@OnInputFileChange" />*@
     @*<p>Upload an image (OLD): <InputFile OnChange="HandleFileSelected_function" /></p>*@
 
@@ -153,6 +152,7 @@
 
 
 <div>
+    <figcaption>Filters (more to be added): </figcaption>
     <button class="btn btn-primary" @onclick="Filter1">No Red</button>
     <button class="btn btn-primary" @onclick="Filter2">No Green</button>
     <button class="btn btn-primary" @onclick="Filter3">No Blue</button>
@@ -170,11 +170,11 @@
 
     @*<button class="btn btn-primary" @onclick="(() => Ray(166))">Ray</button>*@
 
-    <button class="btn btn-primary" @onclick="(() => Edge(0))">Line 0</button>
-    <button class="btn btn-primary" @onclick="(() => Edge(1))">Line 1</button>
-    <button class="btn btn-primary" @onclick="(() => Edge(2))">Line 2</button>
-    <button class="btn btn-primary" @onclick="(() => Edge(3))">Line 3</button>
-    <button class="btn btn-primary" @onclick="(() => Edge(4))">Line 4</button>
+    <button class="btn btn-primary" @onclick="(() => Edge(0))">Line A</button>
+    @*<button class="btn btn-primary" @onclick="(() => Edge(1))">Line B</button>*@
+    <button class="btn btn-primary" @onclick="(() => Edge(2))">Line B</button>
+    @*<button class="btn btn-primary" @onclick="(() => Edge(3))">Line </button>*@
+    <button class="btn btn-primary" @onclick="(() => Edge(4))">Line C</button>
     <br />
 
     <button class="btn btn-primary" @onclick="Reset">Reset</button>
@@ -637,7 +637,7 @@
                     //make weak white lines stronger (applies to black background/white line, non-invert) //way 2
 
                     double m1 = 1.33; //0.5 darker, 1 normal, 2 whiter //BUTTON/SLIDER HERE!!!!
-                    if (parameter1 == 4) { m1 = 1; }
+                    if (parameter1 == 4 || parameter1 == 1) { m1 = 1; }
                     if (Gxy_sum_final_Blue >= 45 && Gxy_sum_final_Blue <= 160) { Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * m1); }
                     if (Gxy_sum_final_Green >= 45 && Gxy_sum_final_Green <= 160) { Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * m1); }
                     if (Gxy_sum_final_Red >= 45 && Gxy_sum_final_Red <= 160) { Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * m1); }
@@ -662,23 +662,24 @@
 
 
                     //////custom color background
-                    //int cutoff = 30; //should try make a slider ouit of this //IDEA1 //make alpha=0 background //30, 45, 60, 75
-                    //if (Gxy_sum_final_Blue <= cutoff && Gxy_sum_final_Green <= cutoff && Gxy_sum_final_Red <= cutoff)
-                    //{
+                    int cutoff = 15; //should try make a slider ouit of this //IDEA1 //make alpha=0 background //30, 45, 60, 75
+                    if (parameter1 == 1) { cutoff = 60; }
+                    if (Gxy_sum_final_Blue <= cutoff && Gxy_sum_final_Green <= cutoff && Gxy_sum_final_Red <= cutoff)
+                    {
 
-                    //    Gxy_sum_final_Blue = 0;
-                    //    Gxy_sum_final_Green = 0;
-                    //    Gxy_sum_final_Red = 0;
-                    //}
-                    //else
-                    //{
-                    //    //if (Gxy_sum_final_Blue < cutoff) { Gxy_sum_final_Blue = cutoff; }
-                    //    //if (Gxy_sum_final_Green < cutoff) { Gxy_sum_final_Green = cutoff; }
-                    //    //if (Gxy_sum_final_Red < cutoff) { Gxy_sum_final_Red = cutoff; }
-                    //    //Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * 1.33);
-                    //    //Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * 1.33);
-                    //    //Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * 1.33);
-                    //}
+                        Gxy_sum_final_Blue = 0;
+                        Gxy_sum_final_Green = 0;
+                        Gxy_sum_final_Red = 0;
+                    }
+                    else
+                    {
+                        //if (Gxy_sum_final_Blue < cutoff) { Gxy_sum_final_Blue = cutoff; }
+                        //if (Gxy_sum_final_Green < cutoff) { Gxy_sum_final_Green = cutoff; }
+                        //if (Gxy_sum_final_Red < cutoff) { Gxy_sum_final_Red = cutoff; }
+                        //Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * 1.33);
+                        //Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * 1.33);
+                        //Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * 1.33);
+                    }
                     //OR..
                     //////..transparant (before invert)
                     //int cutoff = 128; //should try make a slider ouit of this //IDEA1 //make alpha=0 background //180 FOR TRANSPARRENCY
