@@ -902,83 +902,164 @@
     private int maxAllowedFiles = 1;
     private bool isLoading;
 
+    //async Task LoadFiles(InputFileChangeEventArgs e)
+
+    //{
+    //    showloading = true;
+    //    displayImage = false;
+    //    showerror = true;
+
+    //    //var imageFile = e.();
+
+    //    foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+    //    {
+    //        try
+    //        {
+    //            loadedFiles.Add(file);
+
+    //            var trustedFileNameForFileStorage = Path.GetRandomFileName();
+    //            var path = Path.Combine(Environment.ContentRootPath,
+    //                    Environment.EnvironmentName, "unsafe_uploads",
+    //                    trustedFileNameForFileStorage);
+
+    //            //await using FileStream fs = new(path, FileMode.Create);
+    //            //await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+
+
+    //            var ms = new MemoryStream(); // blazorinputfile
+
+    //            await file.OpenReadStream(maxFileSize).CopyToAsync(ms); // blazorinputfile
+
+    //            try
+    //            {
+    //                IImageFormat IIF1; // imagesharp
+    //                imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
+    //                imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
+    //                imgSharp_blank = new Image<Rgba32>(imgSharp.Width, imgSharp.Height);
+
+    //                _ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
+    //                _ip_original = new ImageProcessing_CS(imgSharp, IIF1);
+    //                _ip_blank = new ImageProcessing_CS(imgSharp_blank, IIF1);
+
+
+    //                status = $"Finished loading {file.Size} bytes from {file.Name}";
+    //                showloading = false;
+    //                displayImage = true;
+    //                showerror = false;
+
+
+    //                //Debug.WriteLine(IIF1);
+
+
+    //            }
+
+
+    //            catch (Exception x)
+    //            //catch (System.ArgumentException e)
+    //            {
+    //                Error = $"Error occured while loading image. {x.Message}(1)";
+    //                showerror = true;
+    //                showloading = false;
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //        }
+    //    }
+
+
+    //    Debug.WriteLine("OnInputFile change activated");
+
+    //}
+
+
+
     async Task LoadFiles(InputFileChangeEventArgs e)
-
     {
-        showloading = true;
+
         displayImage = false;
-        showerror = true;
+        showerror = false;
+        showloading = true;
+
+        //Debug.WriteLine(e);
+        //Microsoft.AspNetCore.Components.Forms.InputFileChangeEventArgs
+        //Microsoft.AspNetCore.Components.Forms.InputFileChangeEventArgs
 
 
-        //var imageFile = e.();
 
-        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        IBrowserFile imageFile = e.File;
+
+
+        //string imageType = imageFile.ContentType;
+        //Debug.WriteLine($"data:{imageType};base64,{Convert.ToBase64String(buffers)}");
+
+
+        //await using FileStream fs = new(e, System.IO.FileMode.Create);
+        //await browserFile.OpenReadStream().CopyToAsync(fs);
+
+
+        if (imageFile != null) // blazorinputfile
         {
+            //var ms = new MemoryStream(); // blazorinputfile
+            //await imageFile.Data.CopyToAsync(ms); // blazorinputfile
+            var buffers = new byte[imageFile.Size];
+            await imageFile.OpenReadStream().ReadAsync(buffers);
+
+            ///ADDED
             try
             {
-                loadedFiles.Add(file);
+                IImageFormat IIF1; // imagesharp
+                //imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
+                //imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
+                imgSharp = Image.Load<Rgba32>(buffers, out IIF1); // imagesharp
+                imgSharp_original1 = Image.Load<Rgba32>(buffers, out IIF1);
+                imgSharp_blank = new Image<Rgba32>(imgSharp.Width, imgSharp.Height);
 
-                var trustedFileNameForFileStorage = Path.GetRandomFileName();
-                var path = Path.Combine(Environment.ContentRootPath,
-                        Environment.EnvironmentName, "unsafe_uploads",
-                        trustedFileNameForFileStorage);
-
-                //await using FileStream fs = new(path, FileMode.Create);
-                //await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
-
-
-                var ms = new MemoryStream(); // blazorinputfile
-
-                await file.OpenReadStream(maxFileSize).CopyToAsync(ms); // blazorinputfile
-
-                try
-                {
-                    IImageFormat IIF1; // imagesharp
-                    imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
-                    imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
-                    imgSharp_blank = new Image<Rgba32>(imgSharp.Width, imgSharp.Height);
-
-                    _ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
-                    _ip_original = new ImageProcessing_CS(imgSharp, IIF1);
-                    _ip_blank = new ImageProcessing_CS(imgSharp_blank, IIF1);
+                _ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
+                _ip_original = new ImageProcessing_CS(imgSharp, IIF1);
+                _ip_blank = new ImageProcessing_CS(imgSharp_blank, IIF1);
 
 
-                    status = $"Finished loading {file.Size} bytes from {file.Name}";
-                    showloading = false;
-                    displayImage = true;
-                    showerror = false;
+                status = $"Finished loading {imageFile.Size} bytes from {imageFile.Name}";
+                showloading = false;
+                displayImage = true;
+                showerror = false;
 
 
-                    //Debug.WriteLine(IIF1);
+                //Debug.WriteLine(IIF1);
 
-
-                }
-
-
-                catch (Exception x)
-                //catch (System.ArgumentException e)
-                {
-                    Error = $"Error occured while loading image. {x.Message}(1)";
-                    showerror = true;
-                    showloading = false;
-                }
+                //SixLabors.ImageSharp.Formats.Png.PngFormat works with transparency
+                //SixLabors.ImageSharp.Formats.Jpeg.JpegFormat does not
             }
-            catch (Exception ex)
+
+
+            catch (Exception x)
+            //catch (System.ArgumentException e)
             {
+                Error = $"Error occured while loading image. {x.Message}(1)";
+                showerror = true;
+                showloading = false;
             }
+
+        }
+        else
+        {
+            Error = $"Unknown error occurred. Try refreshing. (2)";
+            showerror = true;
+            showloading = false;
         }
 
-
-        Debug.WriteLine("OnInputFile change activated");
 
     }
 
 
 
 
-    /// replace this file upload BEG
-    /// replace this file upload
-    /// replace this file upload
+
+
+    ////// replace this file upload BEG
+    ////// replace this file upload
+    ////// replace this file upload
 
     // Uncaught(in promise) Error: Error: System.ArgumentException: There is no tracked object with id '1'. Perhaps the DotNetObjectReference instance was already disposed. (Parameter 'dotNetObjectId')
     //at Microsoft.JSInterop.JSRuntime.GetObjectReference(Int64 dotNetObjectId)
@@ -989,6 +1070,7 @@
     //use blazorinputfile extension nuget
     ////take in file input and create imagesharp
     //async Task OnInputFileChange(InputFileChangeEventArgs e)
+    ////async Task LoadFiles(InputFileChangeEventArgs e)
     ////async Task HandleFileSelected_function(IFileListEntry[] files) // blazorinputfile
     //{
 
@@ -1063,10 +1145,10 @@
 
     //}
 
-    /// replace this file upload END
-    /// replace this file upload
-    /// replace this file upload
-    ///
+    ////// replace this file upload END
+    ////// replace this file upload
+    ////// replace this file upload
+    //////
 
 
 
