@@ -104,16 +104,32 @@
 
 
 <h1>Image Editor</h1>
-@*<p>Upload an image (OLD): <InputFile OnChange="HandleFileSelected_function" /></p>*@
 
+<figure>
+    <figcaption>Notes:</figcaption>
+    <ul>
+
+        <li>
+            Uploading/editing a 4k image takes >45 seconds.
+        </li>
+        <li>
+            For line filters, use images with minimal background and high resolution for best results.
+        </li>
+        <li>
+            Maximum upload file size: 10 MB.
+        </li>
+
+    </ul>
+</figure>
 
 <form>
-    <p>Upload an image:</p>
+    <figcaption>Upload an image:</figcaption>
     @*<InputFile OnChange="@OnInputFileChange" />*@
+    @*<p>Upload an image (OLD): <InputFile OnChange="HandleFileSelected_function" /></p>*@
 
-    <InputFile OnChange="@LoadFiles" />
+
+    <InputFile id="Upload an image" class="btn-primary" OnChange="@LoadFiles" />
     @*only available in Net 5.0, so use net 5.0 and ensure that ur fully migrated to net 5.0~!!!!*@
-
 
     @*<InputFile />
         <button type="submit">Upload Selected File(s)</button>*@
@@ -121,12 +137,7 @@
 </form>
 
 
-<p>
-    Note: <br />
-    Uploading/editing a 4k image takes >45 seconds. <br />
-    For best results, use images with minimal background and high resolution. <br />
-    Maximum upload file size: 10 MB. <br />
-</p>
+
 
 
 <div>
@@ -145,6 +156,7 @@
     <button class="btn btn-primary" @onclick="Filter1">No Red</button>
     <button class="btn btn-primary" @onclick="Filter2">No Green</button>
     <button class="btn btn-primary" @onclick="Filter3">No Blue</button>
+    <button class="btn btn-primary" @onclick="Grayscale">Grayscale</button>
     <br />
 
     @*<button class="btn btn-primary" @onclick="Brighten">Brightness (+)</button>
@@ -157,8 +169,7 @@
         <br />*@
 
     @*<button class="btn btn-primary" @onclick="(() => Ray(166))">Ray</button>*@
-    <button class="btn btn-primary" @onclick="Grayscale">Grayscale</button>
-    <br />
+
 
     <button class="btn btn-primary" @onclick="(() => Edge(1))">Line1</button>
     <button class="btn btn-primary" @onclick="(() => Edge(2))">Line2</button>
