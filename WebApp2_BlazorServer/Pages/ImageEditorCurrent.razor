@@ -121,7 +121,12 @@
 </form>
 
 
-<p>Note: Uploading/editing a 4k image takes >45 seconds. For best results, use images with minimal background and high resolution.</p>
+<p>
+    Note: <br />
+    Uploading/editing a 4k image takes >45 seconds. <br />
+    For best results, use images with minimal background and high resolution. <br />
+    Maximum upload file size: 10 MB. <br />
+</p>
 
 
 <div>
@@ -1008,10 +1013,13 @@
 
             ////way3
             //await using FileStream ms = new(e.File, FileMode.Create);
-            await using MemoryStream ms = new MemoryStream();
-            await imageFile.OpenReadStream().CopyToAsync(ms);
+            //await using MemoryStream ms = new MemoryStream();
+            //await imageFile.OpenReadStream().CopyToAsync(ms);
 
-
+            //way4
+            int maxAllowedSize = 10000000;
+            MemoryStream ms = new MemoryStream();
+            await imageFile.OpenReadStream(maxAllowedSize).CopyToAsync(ms);
             try
             {
 
