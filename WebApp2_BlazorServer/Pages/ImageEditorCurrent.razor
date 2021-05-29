@@ -108,7 +108,7 @@
 
 
 <form>
-    <p>Upload an image (NEW):</p>
+    <p>Upload an image:</p>
     @*<InputFile OnChange="@OnInputFileChange" />*@
 
     <InputFile OnChange="@LoadFiles" />
@@ -122,7 +122,7 @@
 
 
 <p>Note: Uploading/editing a 4k image takes >45 seconds. For best results, use images with minimal background and high resolution.</p>
-<p>@status</p>
+
 
 <div>
     @if (showloading == true)
@@ -131,6 +131,8 @@
     {<p style="color:darkorange">Processing...</p>}
     @if (showerror == true)
     {<p style="color:red">@Error</p>}
+    @if (showloading == false)
+    {<p>@status</p>}
 </div>
 
 
@@ -981,6 +983,7 @@
         showerror = false;
         showloading = true;
 
+
         //Debug.WriteLine(e);
         //Microsoft.AspNetCore.Components.Forms.InputFileChangeEventArgs
         //Microsoft.AspNetCore.Components.Forms.InputFileChangeEventArgs
@@ -1008,6 +1011,7 @@
             ///ADDED
             try
             {
+                
                 IImageFormat IIF1; // imagesharp
                 //imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
                 //imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
@@ -1036,7 +1040,7 @@
             catch (Exception x)
             //catch (System.ArgumentException e)
             {
-                Error = $"Error occured while loading image. {x.Message}(1)";
+                Error = $"Error occured while loading image. {x.Message}";
                 showerror = true;
                 showloading = false;
             }
@@ -1044,7 +1048,7 @@
         }
         else
         {
-            Error = $"Unknown error occurred. Try refreshing. (2)";
+            Error = $"Unknown error occurred. Try again.";
             showerror = true;
             showloading = false;
         }
