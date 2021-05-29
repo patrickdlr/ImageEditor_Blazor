@@ -1003,21 +1003,21 @@
 
         if (imageFile != null) // blazorinputfile
         {
-            //var ms = new MemoryStream(); // blazorinputfile
+            var ms = new MemoryStream(); // blazorinputfile
             //await imageFile.Data.CopyToAsync(ms); // blazorinputfile
-            var buffers = new byte[imageFile.Size];
+            await imageFile.OpenReadStream().CopyToAsync(ms); // blazorinputfile
+            //var buffers = new byte[imageFile.Size];
             //await imageFile.OpenReadStream().ReadAsync(buffers);
-            await imageFile.OpenReadStream().CopyToAsync(buffers);
 
             ///ADDED
             try
             {
 
                 IImageFormat IIF1; // imagesharp
-                //imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
-                //imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
-                imgSharp = Image.Load<Rgba32>(buffers, out IIF1); // imagesharp
-                imgSharp_original1 = Image.Load<Rgba32>(buffers, IIF1);
+                imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
+                imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
+                //imgSharp = Image.Load<Rgba32>(buffers, out IIF1); // imagesharp
+                //imgSharp_original1 = Image.Load<Rgba32>(buffers,out IIF1);
                 imgSharp_blank = new Image<Rgba32>(imgSharp.Width, imgSharp.Height);
 
                 _ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
