@@ -113,7 +113,7 @@
             Uploading/editing a 4k image takes >45 seconds.
         </li>
         <li>
-            For line filters, use images with minimal background and high resolution for best results.
+            If using line filters, use images with high resolution and minimal background for best results.
         </li>
         <li>
             Maximum upload file size: 10 MB.
@@ -128,7 +128,7 @@
     @*<p>Upload an image (OLD): <InputFile OnChange="HandleFileSelected_function" /></p>*@
 
 
-    <InputFile id="Upload an image" class="btn-primary" OnChange="@LoadFiles" />
+    <InputFile id="Upload an image" OnChange="@LoadFiles" />
     @*only available in Net 5.0, so use net 5.0 and ensure that ur fully migrated to net 5.0~!!!!*@
 
     @*<InputFile />
@@ -170,11 +170,11 @@
 
     @*<button class="btn btn-primary" @onclick="(() => Ray(166))">Ray</button>*@
 
-
-    <button class="btn btn-primary" @onclick="(() => Edge(1))">Line1</button>
-    <button class="btn btn-primary" @onclick="(() => Edge(2))">Line2</button>
-    <button class="btn btn-primary" @onclick="(() => Edge(3))">Line3</button>
-    <button class="btn btn-primary" @onclick="(() => Edge(4))">Line4</button>
+    <button class="btn btn-primary" @onclick="(() => Edge(0))">Line 0</button>
+    <button class="btn btn-primary" @onclick="(() => Edge(1))">Line 1</button>
+    <button class="btn btn-primary" @onclick="(() => Edge(2))">Line 2</button>
+    <button class="btn btn-primary" @onclick="(() => Edge(3))">Line 3</button>
+    <button class="btn btn-primary" @onclick="(() => Edge(4))">Line 4</button>
     <br />
 
     <button class="btn btn-primary" @onclick="Reset">Reset</button>
@@ -484,17 +484,18 @@
 
 
             //prewitt
-            if (parameter1 == 4)
+
+            if (parameter1 == 0)
             {
-                //alternative, prewitt?, more intense
-                array_gx[0, 0] = 5; array_gx[0, 1] = 5; array_gx[0, 2] = 5;
-                array_gx[1, 0] = -3; array_gx[1, 1] = 0; array_gx[1, 2] = -3;
-                array_gx[2, 0] = -3; array_gx[2, 1] = -3; array_gx[2, 2] = -3;
-                array_gy[0, 0] = 5; array_gy[0, 1] = -3; array_gy[0, 2] = -3;
-                array_gy[1, 0] = 5; array_gy[1, 1] = 0; array_gy[1, 2] = -3;
-                array_gy[2, 0] = 5; array_gy[2, 1] = -3; array_gy[2, 2] = -3;
+                //sobel
+                array_gx[0, 0] = -1; array_gx[0, 1] = 0; array_gx[0, 2] = 1;
+                array_gx[1, 0] = -2; array_gx[1, 1] = 0; array_gx[1, 2] = 2;
+                array_gx[2, 0] = -1; array_gx[2, 1] = 0; array_gx[2, 2] = 1;
+                array_gy[0, 0] = -1; array_gy[0, 1] = -2; array_gy[0, 2] = -1;
+                array_gy[1, 0] = 0; array_gy[1, 1] = 0; array_gy[1, 2] = 0;
+                array_gy[2, 0] = 1; array_gy[2, 1] = 2; array_gy[2, 2] = 1;
             }
-            else if (parameter1 == 2 || parameter1 == 3 )
+            else if (parameter1 == 1 || parameter1 == 2 || parameter1 == 3 )
             {
                 //alternative, prewitt?, more intense
                 array_gx[0, 0] = -2; array_gx[0, 1] = 0; array_gx[0, 2] = 2;
@@ -504,15 +505,15 @@
                 array_gy[1, 0] = 0; array_gy[1, 1] = 0; array_gy[1, 2] = 0;
                 array_gy[2, 0] = 2; array_gy[2, 1] = 2; array_gy[2, 2] = 2;
             }
-            else
+            else if (parameter1 == 4)
             {
-                //sobel
-                array_gx[0, 0] = -1; array_gx[0, 1] = 0; array_gx[0, 2] = 1;
-                array_gx[1, 0] = -2; array_gx[1, 1] = 0; array_gx[1, 2] = 2;
-                array_gx[2, 0] = -1; array_gx[2, 1] = 0; array_gx[2, 2] = 1;
-                array_gy[0, 0] = -1; array_gy[0, 1] = -2; array_gy[0, 2] = -1;
-                array_gy[1, 0] = 0; array_gy[1, 1] = 0; array_gy[1, 2] = 0;
-                array_gy[2, 0] = 1; array_gy[2, 1] = 2; array_gy[2, 2] = 1;
+                //alternative, prewitt?, more intense
+                array_gx[0, 0] = 5; array_gx[0, 1] = 5; array_gx[0, 2] = 5;
+                array_gx[1, 0] = -3; array_gx[1, 1] = 0; array_gx[1, 2] = -3;
+                array_gx[2, 0] = -3; array_gx[2, 1] = -3; array_gx[2, 2] = -3;
+                array_gy[0, 0] = 5; array_gy[0, 1] = -3; array_gy[0, 2] = -3;
+                array_gy[1, 0] = 5; array_gy[1, 1] = 0; array_gy[1, 2] = -3;
+                array_gy[2, 0] = 5; array_gy[2, 1] = -3; array_gy[2, 2] = -3;
             }
 
 
@@ -735,7 +736,7 @@
 
                     //No BW and/or shade way 0
 
-                    if (parameter1 == 1)
+                    if (parameter1 == 1 || parameter1 == 0)
                     {
                         ////Make BW only way 1
                         int bwcolor = (Gxy_sum_final_Blue + Gxy_sum_final_Green + Gxy_sum_final_Red) / 3;
@@ -1067,7 +1068,7 @@
             catch (Exception x)
             //catch (System.ArgumentException e)
             {
-                Error = $"Error occured while loading image. {x.Message}";
+                Error = $"File is not an image (BMP/GIF/JPG/JPEG/PNG/TGA). Try again.";
                 showerror = true;
                 showloading = false;
             }
