@@ -1003,10 +1003,15 @@
             //await imageFile.OpenReadStream().CopyToAsync(ms); // inputfile
 
             ////way 2
-            var ms = new byte[imageFile.Size];
-            await imageFile.OpenReadStream().ReadAsync(ms);
+            //var ms = new byte[imageFile.Size];
+            //await imageFile.OpenReadStream().ReadAsync(ms);
 
-            ///ADDED
+            ////way3
+            //await using FileStream ms = new(e.File, FileMode.Create);
+            await using MemoryStream ms = new MemoryStream();
+            await imageFile.OpenReadStream().CopyToAsync(ms);
+
+
             try
             {
 
