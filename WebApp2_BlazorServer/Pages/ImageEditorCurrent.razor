@@ -984,12 +984,6 @@
         showloading = true;
 
 
-        //Debug.WriteLine(e);
-        //Microsoft.AspNetCore.Components.Forms.InputFileChangeEventArgs
-        //Microsoft.AspNetCore.Components.Forms.InputFileChangeEventArgs
-
-
-
         IBrowserFile imageFile = e.File;
 
 
@@ -1003,21 +997,27 @@
 
         if (imageFile != null) // blazorinputfile
         {
-            var ms = new MemoryStream(); // blazorinputfile
-            //await imageFile.Data.CopyToAsync(ms); // blazorinputfile
-            await imageFile.OpenReadStream().CopyToAsync(ms); // blazorinputfile
-            //var buffers = new byte[imageFile.Size];
-            //await imageFile.OpenReadStream().ReadAsync(buffers);
+            ////way 1
+            //var ms = new MemoryStream(); // blazorinputfile
+            ////await imageFile.Data.CopyToAsync(ms); // blazorinputfile
+            //await imageFile.OpenReadStream().CopyToAsync(ms); // inputfile
+
+            ////way 2
+            var ms = new byte[imageFile.Size];
+            await imageFile.OpenReadStream().ReadAsync(ms);
 
             ///ADDED
             try
             {
 
                 IImageFormat IIF1; // imagesharp
+                ////way 1
                 imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
                 imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
+                ////way 2
                 //imgSharp = Image.Load<Rgba32>(buffers, out IIF1); // imagesharp
                 //imgSharp_original1 = Image.Load<Rgba32>(buffers,out IIF1);
+
                 imgSharp_blank = new Image<Rgba32>(imgSharp.Width, imgSharp.Height);
 
                 _ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
@@ -1026,6 +1026,8 @@
 
 
                 status = $"Finished loading {imageFile.Size} bytes from {imageFile.Name}";
+
+
                 showloading = false;
                 displayImage = true;
                 showerror = false;
