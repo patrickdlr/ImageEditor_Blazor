@@ -97,20 +97,7 @@
 
 <h1>Image Editor</h1>
 
-<figure>
-    <figcaption>Notes:</figcaption>
-    <ul>
-        <li>
-            If using line filters, use images with high resolution and minimal background for best results.
-        </li>
-        <li>
-            Loading/editing a large image may take >45 seconds due to web app performance limitations.
-        </li>
-        <li>
-            No data gets collected on this site.
-        </li>
-    </ul>
-</figure>
+
 
 <form>
     <figcaption>Upload an image (10 MB max):</figcaption
@@ -177,6 +164,7 @@
 </div>
 
 
+
 @if (displayImage == true)
 {
     <p>
@@ -187,7 +175,20 @@
         </div>
     </p>
 }
-
+<figure>
+    <figcaption>Notes:</figcaption>
+    <ul>
+        <li>
+            If using line filters, use images with high resolution and minimal background for best results.
+        </li>
+        <li>
+            Loading/editing a large image may take >45 seconds due to web app performance limitations.
+        </li>
+        <li>
+            No data gets collected on this site.
+        </li>
+    </ul>
+</figure>
 
 
 @code {
