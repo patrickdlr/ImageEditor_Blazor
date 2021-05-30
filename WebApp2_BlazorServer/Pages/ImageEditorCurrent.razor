@@ -81,9 +81,7 @@
         _ip_blank = new ImageProcessing_CS(imgSharp_blank, IIF1);
 
         displayImage = true;
-
     }
-
     Task SomeStartupTask()
     {
         // Do some task based work
@@ -95,13 +93,7 @@
         SomeStartupMethod();
         await SomeStartupTask();
     }
-    //METHOD TO be called first
-    //METHOD TO be called first
 }
-
-
-
-
 
 <h1>Image Editor</h1>
 
@@ -112,22 +104,20 @@
             If using line filters, use images with high resolution and minimal background for best results.
         </li>
         <li>
-            Editing a large (4k) image takes >45 seconds due to performance limitations of web apps.
+            Loading/editing a large image could take >45 seconds due to performance limitations of web apps.
         </li>
         <li>
             No data gets collected on this site.
         </li>
-
     </ul>
 </figure>
 
 <form>
-    <figcaption>Upload an image (10 MB max):</figcaption>
+    <figcaption>Upload an image (10 MB max):</figcaption
+    <InputFile id="Upload an image" OnChange="@LoadFiles" />
+
     @*<InputFile OnChange="@OnInputFileChange" />*@
     @*<p>Upload an image (OLD): <InputFile OnChange="HandleFileSelected_function" /></p>*@
-
-
-    <InputFile id="Upload an image" OnChange="@LoadFiles" />
     @*only available in Net 5.0, so use net 5.0 and ensure that ur fully migrated to net 5.0~!!!!*@
 
     @*<InputFile />
