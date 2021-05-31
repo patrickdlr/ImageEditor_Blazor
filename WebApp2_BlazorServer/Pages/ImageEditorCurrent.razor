@@ -5,13 +5,38 @@
     //SixLabors.ImageSharp.Formats.Jpeg.JpegFormat does not
 
     //LIST OF PROBLEMS
-    //fix the navbar, check if huesset.com is SSL secured after 24 hours (after 10:40am 5/25) ///PROBLEM 0
+    //fix the navbar, check if huesset.com is SSL secured after 24 hours (after 10:40am 5/25) ///PROBLEM 0 (DONE)
     //fix darken/brightness, like make it use centralized variable and original photo ///PROBLEM1
-    //need to make every uploaded images act as PNG //PROBLEM2
+    //need to make every uploaded images act as PNG // //make any photo support ARGB or turn into PNG upon upload (to make ccapable of going transparant) //PROBLEM2
     //update imgSharp_original, should get another imgSharp_original2 to make sure that the reset button works as intended ///PROBLEM3
     //resize/center photo better? off to the right, not well centered ///PROBLEM4
-    //how to make gradual increase, not sudden increase throughout range //PROBLEM5*@
+    //how to make gradual increase, not sudden increase throughout range //PROBLEM5
 
+    //Feature Request
+    //add button to scroll webpage to exact point for you (helps people scroll to image quickly without using their hands)
+    //disable button when image is loading or peocessing (greyed out button)
+    //add processing status.. like "processing... estimated time: 10-40 seconds" (add counter)
+    //prevent webpage from resetting when exiting or clicking on other tab/button/link, aka keep the state same for x hours maximum
+    //descale image
+    //add no red/green/blue incremental filter
+    //add contrast filter (if grayscale > 128: -20, else if grayscale <= 128: +20)
+    //add exposure filer (if grayscale > 128: + 20 // if grayscale > 128: -20)
+    //make Reddit/Twitter scraper, build an past-performance analytic (rising mentions vs. stock/crypto price vs. Google trend)
+    //add 8/16/...256 color photo filter
+    //add gaussian filter
+    //add line+shade filter
+    //improve navbar to make it only show at the top rather on the side
+    //need to accept only pictures; not PDFs, videos, etc. on iPhone
+
+    //implement pan zoom (try timmywill)
+    //add 2d spheres
+    //add white and black background button
+    //add send a message to Patrick's email or database
+    //how to make blazor faster, check if SignalR is good to speed up your image editor app, implement SignalR (important)
+
+
+
+*@
 
 @*@using BlazorInputFile; obsolate*@
 @using System;
@@ -46,16 +71,21 @@
     Image<Rgba32> imgSharp;
     Image<Rgba32> imgSharp_original1; //used by reset
     Image<Rgba32> imgSharp_original2; //used by darken/brighten
-    Image<Rgba32> imgSharp_original3; //used by other filters
-    Image<Rgba32> imgSharp_underneath;
-    Image<Rgba32> imgSharp_blank;
+    Image<Rgba32> imgSharp_original3; //not needed?
 
-    //Image<Rgba32> imgSharp_previous_forundo;
-    //Image<Rgba32> imgSharp_prior_forredo;
+
+    int brightness = 0;
+
+
+    List<Image<Rgba32>> imgSharplist_undo = new List<Image<Rgba32>>();
+    List<Image<Rgba32>> imgSharplist_redo = new List<Image<Rgba32>>();
+    List<int> brightnesslist_undo = new List<int>();
+    List<int> brightnesslist_redo = new List<int>();
+
 
     ImageProcessing_CS _ip;
     ImageProcessing_CS _ip_original;
-    ImageProcessing_CS _ip_blank;
+
 
     IImageFormat IIF1;
     //need to make every uploaded images act as PNG //PROBLEM2
@@ -64,7 +94,6 @@
     //IImageFormat IIF2 = SixLabors.ImageSharp.Formats.Png.PngFormat;
     //int num1 = 60;
 
-    int brightness = 0;
 
     //METHOD TO be called first
     //METHOD TO be called first
@@ -74,11 +103,12 @@
         // Make website show uploaded/sample image upon loading
         imgSharp = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1); // imagesharp
         imgSharp_original1 = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
-        imgSharp_blank = new Image<Rgba32>(imgSharp.Width, imgSharp.Height);
+        imgSharp_original2 = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
+
+
 
         _ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
         _ip_original = new ImageProcessing_CS(imgSharp, IIF1);
-        _ip_blank = new ImageProcessing_CS(imgSharp_blank, IIF1);
 
         displayImage = true;
     }
@@ -93,16 +123,18 @@
         SomeStartupMethod();
         await SomeStartupTask();
     }
+    //METHOD TO be called first
+    //METHOD TO be called first
 }
 
 <h1>Image Editor</h1>
 
 
-
 <form>
-    <figcaption>Upload an image (10 MB max):</figcaption
+    <figcaption>
+        Upload an image (10 MB max):
+    </figcaption>
     <InputFile id="Upload an image" OnChange="@LoadFiles" />
-
     @*<InputFile OnChange="@OnInputFileChange" />*@
     @*<p>Upload an image (OLD): <InputFile OnChange="HandleFileSelected_function" /></p>*@
     @*only available in Net 5.0, so use net 5.0 and ensure that ur fully migrated to net 5.0~!!!!*@
@@ -111,9 +143,6 @@
         <button type="submit">Upload Selected File(s)</button>*@
     @*<input multiple="" type="file" _bl_2="">*@
 </form>
-
-
-
 
 
 <div>
@@ -136,9 +165,9 @@
     <button class="btn btn-primary" @onclick="Grayscale">Grayscale</button>
     <br />
 
-    @*<button class="btn btn-primary" @onclick="Brighten">Brightness (+)</button>
-        <button class="btn btn-primary" @onclick="Darken">Brightness (-)</button>
-        <br />*@
+    <button class="btn btn-primary" @onclick="Brighten">Brightness (+)</button>
+    <button class="btn btn-primary" @onclick="Darken">Brightness (-)</button>
+    <br />
 
     @*<button class="btn btn-primary" @onclick="Opaque">Opacity (+)</button>
         <button class="btn btn-primary" @onclick="Transparent">Opacity (-)</button>
@@ -160,9 +189,7 @@
     @*<button class="btn btn-primary">Undo (coming soon)</button>
         <button class="btn btn-primary">Redo (coming soon)</button>
         <br />*@
-
 </div>
-
 
 
 @if (displayImage == true)
@@ -230,9 +257,7 @@
                 }
             }
         }
-
     }
-
 
     //pixel manipulation way 2
     //(not storing variable)
@@ -291,7 +316,6 @@
         }
         //Debug.WriteLine(blue);
         //imgSharp_original3 = imgSharp_original2;
-
     }
 
     //pixel manipulation way 2
@@ -332,10 +356,12 @@
                     pixelRowSpan[x] = new Rgba32(red2, green2, blue2, imgSharp[x, y].A);
                 }
             }
+
+
+
         }
         //Debug.WriteLine(blue);
     }
-
 
 
     //pixel manipulation way 2
@@ -392,7 +418,6 @@
     }
 
 
-
     //pixel manipulation way 1
     //(storing variable)
     //grayscale filter
@@ -414,7 +439,6 @@
         //imgSharp = imgSharp_original;
         //imgSharp.Mutate(x => x.Grayscale());
     }
-
 
 
     void Ray(int n1)
@@ -459,6 +483,7 @@
         }
     }
 
+
     //WIP, use way 2,
     //works on small image
     void Edge(int parameter1)
@@ -486,7 +511,7 @@
                 array_gy[1, 0] = 0; array_gy[1, 1] = 0; array_gy[1, 2] = 0;
                 array_gy[2, 0] = 1; array_gy[2, 1] = 2; array_gy[2, 2] = 1;
             }
-            else if (parameter1 == 1 || parameter1 == 2 || parameter1 == 3 )
+            else if (parameter1 == 1 || parameter1 == 2 || parameter1 == 3)
             {
                 //alternative, prewitt?, more intense
                 array_gx[0, 0] = -2; array_gx[0, 1] = 0; array_gx[0, 2] = 2;
@@ -875,12 +900,14 @@
         }
     }
 
+
     void Redo()
     {
         if (displayImage == true)
         {
         }
     }
+
 
     void Reset()
     {
@@ -897,11 +924,10 @@
         }
     }
 
+
     public void Dispose()
     {
     }
-
-
 
 
     string Message = "No file(s) selected";
@@ -946,11 +972,9 @@
     //                IImageFormat IIF1; // imagesharp
     //                imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
     //                imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
-    //                imgSharp_blank = new Image<Rgba32>(imgSharp.Width, imgSharp.Height);
 
     //                _ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
     //                _ip_original = new ImageProcessing_CS(imgSharp, IIF1);
-    //                _ip_blank = new ImageProcessing_CS(imgSharp_blank, IIF1);
 
 
     //                status = $"Finished loading {file.Size} bytes from {file.Name}";
@@ -1028,18 +1052,17 @@
             {
 
                 IImageFormat IIF1; // imagesharp
-                ////way 1
+                                   ////way 1
                 imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
                 imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
+                imgSharp_original2 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
                 ////way 2
                 //imgSharp = Image.Load<Rgba32>(buffers, out IIF1); // imagesharp
                 //imgSharp_original1 = Image.Load<Rgba32>(buffers,out IIF1);
 
-                imgSharp_blank = new Image<Rgba32>(imgSharp.Width, imgSharp.Height);
 
                 _ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
                 _ip_original = new ImageProcessing_CS(imgSharp, IIF1);
-                _ip_blank = new ImageProcessing_CS(imgSharp_blank, IIF1);
 
 
                 status = $"Finished loading {imageFile.Size} bytes from {imageFile.Name}";
@@ -1075,10 +1098,6 @@
 
 
     }
-
-
-
-
 
 
     ////// replace this file upload BEG
@@ -1118,11 +1137,9 @@
     //                IImageFormat IIF1; // imagesharp
     //                imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
     //                imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
-    //                imgSharp_blank = new Image<Rgba32>(imgSharp.Width, imgSharp.Height);
 
     //                _ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
     //                _ip_original = new ImageProcessing_CS(imgSharp, IIF1);
-    //                _ip_blank = new ImageProcessing_CS(imgSharp_blank, IIF1);
 
 
     //                status = $"Finished loading {imageFile.Size} bytes from {imageFile.Name}";
@@ -1173,9 +1190,6 @@
     ////// replace this file upload
     ////// replace this file upload
     //////
-
-
-
 
 
 }
