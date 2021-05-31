@@ -39,6 +39,18 @@
         <a class="dismiss">🗙</a>
     </div>*@
 
+
+    @*<script>
+        //For Hot Reload
+        //dotnet watch run debug
+        window.Blazor.defaultReconnectionHandler.onConnectionDown = function ()
+        {
+            setTimeout(function () {
+            location.reload();
+            }, 5000);
+        };
+    </script>*@
+    
     <script src="_framework/blazor.server.js"></script>
 </body>
 </html>

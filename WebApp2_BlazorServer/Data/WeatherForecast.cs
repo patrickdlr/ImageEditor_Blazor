@@ -1,9 +1,7 @@
 using System;
 
-namespace WebApp2_BlazorServer.Data
-{
-    public class WeatherForecast
-    {
+namespace WebApp2_BlazorServer.Data {
+    public class WeatherForecast {
         public DateTime Date { get; set; }
 
         public int TemperatureC { get; set; }
