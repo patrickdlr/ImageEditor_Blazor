@@ -44,8 +44,8 @@
             document.getElementById('text_Red').value = 0;
         };
         window.JS_resetsliderposition_Green = () => {
-            document.getElementById('slider_Green').value = 0;
-            document.getElementById('text_Green').value = 0;
+            window.getElementById('slider_Green').value = 0;
+            window.getElementById('text_Green').value = 0;
 
         };
         window.JS_resetsliderposition_Blue = () => {
@@ -56,16 +56,17 @@
 
         //update 3 slider positions (RGB) if user adds new input to text field or slider
         window.JS_changesliderposition_Red = (n) => {
-            document.getElementById('slider_Red').value = n;
-            document.getElementById('text_Red').value = n;
+            document.getElementById("slider_Red").value = n;
+            document.getElementById('text_Red').value = n
         };
         window.JS_changesliderposition_Green = (n) => {
             document.getElementById('slider_Green').value = n;
-            document.getElementById('text_Green').value = n;
+            document.getElementById("text_Green").value = n;
+
         };
         window.JS_changesliderposition_Blue = (n) => {
             document.getElementById('slider_Blue').value = n;
-            document.getElementById('text_Blue').value = n;
+            document.getElementById("text_Blue").value = n;
         };
 
 

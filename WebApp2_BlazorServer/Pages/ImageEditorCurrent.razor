@@ -107,7 +107,9 @@
 	bool displayImage = false;
 
 	int brightness = 0;
-
+	//int Value_Red = 0;
+	//int Value_Green = 0;
+	//int Value_Blue = 0;
 
 	Image<Rgba32> imgSharp;
 	Image<Rgba32> imgSharp_original1; //used by reset
@@ -135,9 +137,7 @@
 
 	Dictionary<string, int> DictV = new Dictionary<string, int>();
 
-	//int Value_Red = 0;
-	//int Value_Green = 0;
-	//int Value_Blue = 0;
+
 
 	//METHOD TO be called first
 	//METHOD TO be called first
@@ -228,6 +228,8 @@
 
 
 	<div class="slidecontainer">
+
+		@*WAY 1 using C# stored variables to change input values*@
 		@*Red<br />
 		<input type="range" class="slider" id="slider_Red" min="-255" max="255" value="@Value_Red" @onchange="Onchange_Range_Red">
 		<input type="text" id="text_red" value="@Value_Red" @onchange="Onchange_Range_Red">
@@ -243,19 +245,20 @@
 		<input type="text" id="text_green" value="@Value_Blue" @onchange="Onchange_Range_Blue">
 		<br />*@
 
-		Red<br />
+		@*WAY 2 using javascript function to change input values*@
+		Red
 		<input type="range" class="slider" id="slider_Red" min="-255" max="255" value="0" @onchange="Onchange_Range_Red">
-		<input type="text" id="text_red" value="0" @onchange="Onchange_Range_Red">
+		<input type="text" id="text_Red" style="width: 69px;" value="0" @onchange="Onchange_Range_Red">
 		<br />
 
-		Green<br />
+		Green
 		<input type="range" class="slider" id="slider_Green" min="-255" max="255" value="0" @onchange="Onchange_Range_Green">
-		<input type="text" id="text_green" value="0" @onchange="Onchange_Range_Green">
+		<input type="text" id="text_Green" style="width: 69px;" value="0" @onchange="Onchange_Range_Green">
 		<br />
 
-		Blue<br />
+		Blue
 		<input type="range" class="slider" id="slider_Blue" min="-255" max="255" value="0" @onchange="Onchange_Range_Blue">
-		<input type="text" id="text_green" value="0" @onchange="Onchange_Range_Blue">
+		<input type="text" id="text_Blue" style="width: 69px;" value="0" @onchange="Onchange_Range_Blue">
 		<br />
 	</div>
 
@@ -484,7 +487,7 @@
 		//edit iamge
 		ApplyDictVtoBaseImage();
 
-		//update slider "knob"
+		//update slider "knob" (and text input value without using Value_Red)??
 		JS.InvokeVoidAsync("JS_changesliderposition_Red", val);
 
 		foreach (var a in DictV)
