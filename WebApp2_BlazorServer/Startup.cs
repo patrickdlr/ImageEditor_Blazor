@@ -30,6 +30,7 @@ namespace WebApp2_BlazorServer {
 
             //////signalr
             ///
+            services.AddSignalR();
             services.AddResponseCompression(opts =>
             {
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(

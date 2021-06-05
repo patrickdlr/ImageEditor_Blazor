@@ -73,7 +73,7 @@
 
 	private HubConnection hubConnection;
 
-
+	//chathub
 	private List<string> messages = new List<string>();
 	private string userInput;
 	private string messageInput;
@@ -111,7 +111,7 @@
 
 
 
-
+	//image editor
 	string status = "Sample image";
 	string Error;
 	bool showloading = false;
@@ -124,6 +124,8 @@
 	ImageProcessing_CS _ip;
 	IImageFormat IIF1;
 
+	//async Task Upload() =>
+	//	await hubConnection.SendAsync("UploadFileSR", userInput, messageInput);
 
 	string Message = "No file(s) selected";
 	IReadOnlyList<IBrowserFile> selectedFiles;
