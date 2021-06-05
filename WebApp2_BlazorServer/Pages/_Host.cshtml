@@ -8,22 +8,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Huesset</title>
-    <base href="~/" />
-    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
-    <link href="css/site.css" rel="stylesheet" />
-    <link href="WebApp2_BlazorServer.styles.css" rel="stylesheet" />
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Huesset</title>
+	<base href="~/" />
+	<link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+	<link href="css/site.css" rel="stylesheet" />
+	<link href="WebApp2_BlazorServer.styles.css" rel="stylesheet" />
 
-    <!--additions-->
-    <script src="~/_content/BlazorInputFile/inputfile.js"></script>
-    <script src="_framework/blazor.server.js"></script>
-    <script>
-        Blazor.defaultReconnectionHandler._reconnectCallback = function (d) {
-            document.location.reload();
-        }
-    </script>
+	<!--additions-->
+	<script src="~/_content/BlazorInputFile/inputfile.js"></script>
+
+
+	@*<script src="_framework/blazor.server.js"></script>*@
+	<script src="_framework/blazor.{webassembly|server}.js"></script>
+	<script>
+		Blazor.defaultReconnectionHandler._reconnectCallback = function (d) {
+			document.location.reload();
+		}
+	</script>
+
+
+
+	<script>
+
+        //example
+        //window.displayTickerAlert1 = (symbol, price) => {
+        //    alert(`${symbol}: $${price}!`);
+        //};
+
+
+        //reset 3 slider positions (RGB) to 0
+        window.JS_resetsliderposition_Red = () => {
+            document.getElementById('slider_Red').value = 0;
+            document.getElementById('text_Red').value = 0;
+        };
+        window.JS_resetsliderposition_Green = () => {
+            document.getElementById('slider_Green').value = 0;
+            document.getElementById('text_Green').value = 0;
+
+        };
+        window.JS_resetsliderposition_Blue = () => {
+            document.getElementById('slider_Blue').value = 0;
+            document.getElementById('text_Blue').value = 0;
+        };
+
+
+        //update 3 slider positions (RGB) if user adds new input to text field or slider
+        window.JS_changesliderposition_Red = (n) => {
+            document.getElementById('slider_Red').value = n;
+            document.getElementById('text_Red').value = n;
+        };
+        window.JS_changesliderposition_Green = (n) => {
+            document.getElementById('slider_Green').value = n;
+            document.getElementById('text_Green').value = n;
+        };
+        window.JS_changesliderposition_Blue = (n) => {
+            document.getElementById('slider_Blue').value = n;
+            document.getElementById('text_Blue').value = n;
+        };
+
+
+	</script>
 </head>
 <body>
     <component type="typeof(App)" render-mode="ServerPrerendered" />
@@ -51,6 +97,6 @@
         };
     </script>*@
     
-    <script src="_framework/blazor.server.js"></script>
+	<script src="_framework/blazor.server.js"></script>
 </body>
 </html>
