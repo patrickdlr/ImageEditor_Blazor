@@ -38,33 +38,41 @@
         //};
 
 
-        //reset 3 slider positions (RGB) to 0
-        window.JS_resetsliderposition_Red = () => {
+        //reset slider positions (incremental filters) to 0
+        window.JS_resetsliderpositionandtextvalue_Brightness = () => {
+            document.getElementById('slider_Brightness').value = 0;
+            document.getElementById('text_Brightness').value = 0
+        };
+        window.JS_resetsliderpositionandtextvalue_Red = () => {
             document.getElementById('slider_Red').value = 0;
             document.getElementById('text_Red').value = 0;
         };
-        window.JS_resetsliderposition_Green = () => {
-            window.getElementById('slider_Green').value = 0;
-            window.getElementById('text_Green').value = 0;
+        window.JS_resetsliderpositionandtextvalue_Green = () => {
+            document.getElementById('slider_Green').value = 0;
+            document.getElementById('text_Green').value = 0;
 
         };
-        window.JS_resetsliderposition_Blue = () => {
+        window.JS_resetsliderpositionandtextvalue_Blue = () => {
             document.getElementById('slider_Blue').value = 0;
             document.getElementById('text_Blue').value = 0;
         };
 
 
-        //update 3 slider positions (RGB) if user adds new input to text field or slider
-        window.JS_changesliderposition_Red = (n) => {
+        //reset slider positions (incremental filters) if user adds new input to text field or slider
+        window.JS_changesliderpositionandtextvalue_Brightness = (n) => {
+            document.getElementById('slider_Brightness').value = n;
+            document.getElementById('text_Brightness').value = n
+        };
+        window.JS_changesliderpositionandtextvalue_Red = (n) => {
             document.getElementById("slider_Red").value = n;
             document.getElementById('text_Red').value = n
         };
-        window.JS_changesliderposition_Green = (n) => {
+        window.JS_changesliderpositionandtextvalue_Green = (n) => {
             document.getElementById('slider_Green').value = n;
             document.getElementById("text_Green").value = n;
 
         };
-        window.JS_changesliderposition_Blue = (n) => {
+        window.JS_changesliderpositionandtextvalue_Blue = (n) => {
             document.getElementById('slider_Blue').value = n;
             document.getElementById("text_Blue").value = n;
         };

@@ -38,7 +38,7 @@
 	//add button to scroll webpage to exact point for you (helps people scroll to image quickly without using their hands)
 	//prevent webpage from resetting when exiting or clicking on other tab/button/link, aka keep the state same for x hours maximum
 	//add photo compression percentage (for faster processing, and lower quality)
-
+	//add gamma besides brightness, contrast
 
 
 	//SUGGESTED FEATURES FOR IMAGE EDITOR (logic)
@@ -53,6 +53,7 @@
 	//edit 2 images individually
 	//show history of filters applied
 	//add buffering for image uploading and processing?
+	//add recording feature (records users' orders of image filter applications)
 
 	//Completed/ignore
 	//fix the navbar, check if huesset.com is SSL secured after 24 hours (after 10:40am 5/25) ///PROBLEM 0 (DONE)
@@ -78,8 +79,9 @@
 @using Microsoft.AspNetCore.Components.Forms;
 @using Microsoft.Extensions.Logging
 @using System.Drawing.Imaging;
-@inject IWebHostEnvironment Environment
+@*@inject IWebHostEnvironment Environment*@ @*not needed?*@
 @inject IJSRuntime JS
+
 @*################################################################################*@
 @*################################################################################*@
 @*################################################################################*@
@@ -106,28 +108,31 @@
 	bool showerror = false;
 	bool displayImage = false;
 
-	int brightness = 0;
+	//int Value_Brightness = 0;
 	//int Value_Red = 0;
 	//int Value_Green = 0;
 	//int Value_Blue = 0;
+	int Value_Contrast = 0;
+
 
 	Image<Rgba32> imgSharp;
 	Image<Rgba32> imgSharp_original1; //used by reset
 	Image<Rgba32> imgSharp_original2; //used by darken/brighten
 
 
-
 	List<Image<Rgba32>> imgSharplist_undo = new List<Image<Rgba32>>();
 	List<Image<Rgba32>> imgSharplist_redo = new List<Image<Rgba32>>();
+	List<int> BrightnessV_undo = new List<int>();
+	List<int> BrightnessV_redo = new List<int>();
+	List<bool> RedV_undo = new List<bool>();
+	List<bool> RedV_redo = new List<bool>();
+	List<bool> GreenV_undo = new List<bool>();
+	List<bool> GreenV_redo = new List<bool>();
+	List<bool> BlueV_undo = new List<bool>();
+	List<bool> BlueV_redo = new List<bool>();
 
-	List<int> brightnesslist_undo = new List<int>();
-	List<int> brightnesslist_redo = new List<int>();
-
-	List<bool> incrementallist_undo = new List<bool>();
-	List<bool> incrementallist_redo = new List<bool>();
 
 	ImageProcessing_CS _ip;
-	ImageProcessing_CS _ip_original;
 
 	//need to make every uploaded images act as PNG //PROBLEM2
 	IImageFormat IIF1;
@@ -150,7 +155,6 @@
 		imgSharp_original2 = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
 
 		_ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
-		_ip_original = new ImageProcessing_CS(imgSharp, IIF1);
 		displayImage = true;
 
 		DictV.Add("BrightnessV", 0);
@@ -231,34 +235,39 @@
 
 		@*WAY 1 using C# stored variables to change input values*@
 		@*Red<br />
-		<input type="range" class="slider" id="slider_Red" min="-255" max="255" value="@Value_Red" @onchange="Onchange_Range_Red">
-		<input type="text" id="text_red" value="@Value_Red" @onchange="Onchange_Range_Red">
+		<input type="range" class="slider" id="slider_Red" min="-255" max="255" value="@Value_Red" @onchange="Onchange_Slider_Red">
+		<input type="text" id="text_red" value="@Value_Red" @onchange="Onchange_Slider_Red">
 		<br />
 
 		Green<br />
-		<input type="range" class="slider" id="slider_Green" min="-255" max="255" value="@Value_Green" @onchange="Onchange_Range_Green">
-		<input type="text" id="text_green" value="@Value_Green" @onchange="Onchange_Range_Green">
+		<input type="range" class="slider" id="slider_Green" min="-255" max="255" value="@Value_Green" @onchange="Onchange_Slider_Green">
+		<input type="text" id="text_green" value="@Value_Green" @onchange="Onchange_Slider_Green">
 		<br />
 
 		Blue<br />
-		<input type="range" class="slider" id="slider_Blue" min="-255" max="255" value="@Value_Blue" @onchange="Onchange_Range_Blue">
-		<input type="text" id="text_green" value="@Value_Blue" @onchange="Onchange_Range_Blue">
+		<input type="range" class="slider" id="slider_Blue" min="-255" max="255" value="@Value_Blue" @onchange="Onchange_Slider_Blue">
+		<input type="text" id="text_green" value="@Value_Blue" @onchange="Onchange_Slider_Blue">
 		<br />*@
 
 		@*WAY 2 using javascript function to change input values*@
-		Red
-		<input type="range" class="slider" id="slider_Red" min="-255" max="255" value="0" @onchange="Onchange_Range_Red">
-		<input type="text" id="text_Red" style="width: 69px;" value="0" @onchange="Onchange_Range_Red">
+		Brightness<br />
+		<input type="range" class="slider" id="slider_Brightness" min="-255" max="255" value="0" @onchange="Onchange_Slider_Brightness">
+		<input type="text" id="text_Brightness" style="width: 69px;" value="0" @onchange="Onchange_Slider_Brightness">
 		<br />
 
-		Green
-		<input type="range" class="slider" id="slider_Green" min="-255" max="255" value="0" @onchange="Onchange_Range_Green">
-		<input type="text" id="text_Green" style="width: 69px;" value="0" @onchange="Onchange_Range_Green">
+		Red<br />
+		<input type="range" class="slider" id="slider_Red" min="-255" max="255" value="0" @onchange="Onchange_Slider_Red">
+		<input type="text" id="text_Red" style="width: 69px;" value="0" @onchange="Onchange_Slider_Red">
 		<br />
 
-		Blue
-		<input type="range" class="slider" id="slider_Blue" min="-255" max="255" value="0" @onchange="Onchange_Range_Blue">
-		<input type="text" id="text_Blue" style="width: 69px;" value="0" @onchange="Onchange_Range_Blue">
+		Green<br />
+		<input type="range" class="slider" id="slider_Green" min="-255" max="255" value="0" @onchange="Onchange_Slider_Green">
+		<input type="text" id="text_Green" style="width: 69px;" value="0" @onchange="Onchange_Slider_Green">
+		<br />
+
+		Blue<br />
+		<input type="range" class="slider" id="slider_Blue" min="-255" max="255" value="0" @onchange="Onchange_Slider_Blue">
+		<input type="text" id="text_Blue" style="width: 69px;" value="0" @onchange="Onchange_Slider_Blue">
 		<br />
 	</div>
 
@@ -273,9 +282,9 @@
 	<br />
 
 
-	<button class="btn btn-primary" @onclick="Brighten">Brightness (+)</button>
+	@*<button class="btn btn-primary" @onclick="Brighten">Brightness (+)</button>
 	<button class="btn btn-primary" @onclick="Darken">Brightness (-)</button>
-	<br />
+	<br />*@
 	<button class="btn btn-primary" @onclick="ContrastUp">Contrast (+)</button>
 	<button class="btn btn-primary" @onclick="ContrastDown">Contrast (-)</button>
 	<br />
@@ -369,6 +378,10 @@
 		//adding incremental filters
 		foreach (var a in DictV)
 		{
+			if (a.Key == "BrightnessV")
+			{
+				Brightness(a.Value);
+			}
 			if (a.Key == "RedV")
 			{
 				Red(a.Value);
@@ -383,6 +396,39 @@
 			}
 		}
 	}
+
+
+	//pixel manipulation way 2 //(storing variable)
+	public void Brightness(int val)
+	{
+		if (displayImage == true)
+		{
+			for (int y = 0; y < imgSharp.Height; y++)
+			{
+				Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
+				for (int x = 0; x < imgSharp.Width; x++)
+				{
+					int red = imgSharp[x, y].R + val;
+					int green = imgSharp[x, y].G + val;
+					int blue = imgSharp[x, y].B + val;
+
+					if (red > 255) { red = 255; }
+					else if (red < 0) { red = 0; }
+					if (green > 255) { green = 255; }
+					else if (green < 0) { green = 0; }
+					if (blue > 255) { blue = 255; }
+					else if (blue < 0) { blue = 0; }
+
+					byte red2 = (byte)red;
+					byte green2 = (byte)green;
+					byte blue2 = (byte)blue;
+
+					pixelRowSpan[x] = new Rgba32(red2, green2, blue2, imgSharp[x, y].A);
+				}
+			}
+		}
+	}
+
 
 	//pixel manipulation way 2 (using stored variable (byte))
 	void Red(int val)
@@ -478,59 +524,60 @@
 		}
 	}
 
-	void Onchange_Range_Red(ChangeEventArgs e)
+	void Onchange_Slider_Brightness(ChangeEventArgs e)
+	{
+		int val = int.Parse(e.Value.ToString());
+		//Value_Brightness = val;
+		DictV["BrightnessV"] = val;
+
+		//edit image
+		ApplyDictVtoBaseImage();
+
+		//update slider "knob"
+		JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Brightness", val);
+	}
+	void Onchange_Slider_Red(ChangeEventArgs e)
 	{
 		int val = int.Parse(e.Value.ToString());
 		//Value_Red = val;
 		DictV["RedV"] = val;
 
-		//edit iamge
+		//edit image
 		ApplyDictVtoBaseImage();
 
 		//update slider "knob" (and text input value without using Value_Red)??
-		JS.InvokeVoidAsync("JS_changesliderposition_Red", val);
-
-		foreach (var a in DictV)
-		{
-			Debug.WriteLine(a.Key.ToString() + ":" + a.Value.ToString());
-		}
+		JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Red", val);
 	}
 
-	void Onchange_Range_Green(ChangeEventArgs e)
+	void Onchange_Slider_Green(ChangeEventArgs e)
 	{
 		int val = int.Parse(e.Value.ToString());
 		//Value_Green = val;
 		DictV["GreenV"] = val;
 
-		//edit iamge
+		//edit image
 		ApplyDictVtoBaseImage();
 
 		//update slider "knob"
-		JS.InvokeVoidAsync("JS_changesliderposition_Green", val);
-
-		foreach (var a in DictV)
-		{
-			Debug.WriteLine(a.Key.ToString() + ":" + a.Value.ToString());
-		}
+		JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Green", val);
 	}
 
-	void Onchange_Range_Blue(ChangeEventArgs e)
+	void Onchange_Slider_Blue(ChangeEventArgs e)
 	{
 		int val = int.Parse(e.Value.ToString());
 		//Value_Blue = val;
 		DictV["BlueV"] = val;
 
-		//edit iamge
+		//edit image
 		ApplyDictVtoBaseImage();
 
 		//update slider "knob"
-		JS.InvokeVoidAsync("JS_changesliderposition_Blue", val);
-
-		foreach (var a in DictV)
-		{
-			Debug.WriteLine(a.Key.ToString() + ":" + a.Value.ToString());
-		}
+		JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Blue", val);
 	}
+
+
+
+
 
 
 	async Task Flatten()
@@ -561,44 +608,19 @@
 		//await JS.InvokeVoidAsync("displayTickerAlert1", stockSymbol, price);
 
 		// way2 - call javascript function
-		await JS.InvokeVoidAsync("JS_resetsliderposition_Red");
-		await JS.InvokeVoidAsync("JS_resetsliderposition_Green");
-		await JS.InvokeVoidAsync("JS_resetsliderposition_Blue");
+		await JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Brightness");
+		await JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Red");
+		await JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Green");
+		await JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Blue");
 		//Value_Red = 0;
 		//Value_Green = 0;
 		//Value_Blue = 0;
 	}
 
-	//protected override async void Flatten(bool firstRender)
-	//{
-	//	await JsRuntime.InvokeVoidAsync("elementId");
-	//}
-
-
-
-
-
-	//pixel manipulation way 2
-	//(not storing variable)
-	//void Filter3()
-	//{
-	//	if (displayImage == true)
-	//	{
-	//		for (int y = 0; y < imgSharp.Height; y++)
-	//		{
-	//			Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
-	//			for (int x = 0; x < imgSharp.Width; x++)
-	//			{
-	//				pixelRowSpan[x] = new Rgba32(imgSharp_original1[x, y].R, imgSharp_original1[x, y].G, 45, imgSharp_original1[x, y].A);
-	//			}
-	//		}
-	//	}
-	//}
-
 
 	public void GaussianBlur()
 	{
-
+		Flatten();
 		imgSharp.Mutate(ctx => ctx.GaussianBlur(1));
 
 		//imgSharp_original2 = imgSharp.Clone();
@@ -611,96 +633,6 @@
 			{
 				pixelRowSpan[x] = new Rgba32(imgSharp[x, y].R, imgSharp[x, y].G, imgSharp[x, y].B, imgSharp[x, y].A);
 			}
-		}
-	}
-
-	//pixel manipulation way 2
-	//(storing variable)
-	public void Darken()
-	{
-		if (displayImage == true)
-		{
-			brightness -= 20;
-			int red;
-			byte red2;
-			int green;
-			byte green2;
-			int blue;
-			byte blue2;
-
-			for (int y = 0; y < imgSharp.Height; y++)
-			{
-				Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
-				for (int x = 0; x < imgSharp.Width; x++)
-				{
-					red = imgSharp_original1[x, y].R + brightness;
-					green = imgSharp_original1[x, y].G + brightness;
-					blue = imgSharp_original1[x, y].B + brightness;
-
-					if (red > 255) { red = 255; }
-					else if (red < 0) { red = 0; }
-					if (green > 255) { green = 255; }
-					else if (green < 0) { green = 0; }
-					if (blue > 255) { blue = 255; }
-					else if (blue < 0) { blue = 0; }
-
-					red2 = (byte)red;
-					green2 = (byte)green;
-					blue2 = (byte)blue;
-
-					pixelRowSpan[x] = new Rgba32(red2, green2, blue2, imgSharp[x, y].A);
-				}
-			}
-		}
-		//Debug.WriteLine(blue);
-		//imgSharp_original3 = imgSharp_original2;
-	}
-
-
-	//pixel manipulation way 2
-	//(storing variable)
-	//fix brighten and darken as color get washed out, maybe stop brightening or darkening if one color reaches 255 or 0, or always start from original image and then adjust it using current "multiplier"
-	public void Brighten()
-	{
-		if (displayImage == true)
-		{
-			brightness += 20;
-			int red;
-			byte red2;
-			int green;
-			byte green2;
-			int blue;
-			byte blue2;
-
-			for (int y = 0; y < imgSharp.Height; y++)
-			{
-				Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
-				for (int x = 0; x < imgSharp.Width; x++)
-				{
-					red = imgSharp[x, y].R + brightness;
-					green = imgSharp[x, y].G + brightness;
-					blue = imgSharp[x, y].B + brightness;
-
-					if (red > 255) { red = 255; }
-					else if (red < 0) { red = 0; }
-					if (green > 255) { green = 255; }
-					else if (green < 0) { green = 0; }
-					if (blue > 255) { blue = 255; }
-					else if (blue < 0) { blue = 0; }
-
-					red2 = (byte)red;
-					green2 = (byte)green;
-					blue2 = (byte)blue;
-
-					pixelRowSpan[x] = new Rgba32(red2, green2, blue2, imgSharp[x, y].A);
-				}
-				//}
-
-				//OR
-				//imgSharp.Mutate(ctx => ctx.Brightness((float)+1.1));
-
-			}
-			//Debug.WriteLine(blue);
 		}
 	}
 
@@ -722,14 +654,9 @@
 		//	}
 		//}
 
-		int contrast = 20;
-		int factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
-		int red;
-		byte red2;
-		int green;
-		byte green2;
-		int blue;
-		byte blue2;
+		Value_Contrast += 20;
+		double factor = (259 * (Value_Contrast + 255)) / (255 * (259 - Value_Contrast));
+
 
 
 		for (int y = 0; y < imgSharp.Height; y++)
@@ -737,9 +664,9 @@
 			Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
 			for (int x = 0; x < imgSharp.Width; x++)
 			{
-				red = (factor * (imgSharp[x, y].A - contrast) + contrast);
-				green = (factor * (imgSharp[x, y].G - contrast) + contrast);
-				blue = (factor * (imgSharp[x, y].B - contrast) + contrast);
+				double red = (factor * (imgSharp[x, y].A - Value_Contrast) + Value_Contrast);
+				double green = (factor * (imgSharp[x, y].G - Value_Contrast) + Value_Contrast);
+				double blue = (factor * (imgSharp[x, y].B - Value_Contrast) + Value_Contrast);
 
 				if (red > 255) { red = 255; }
 				else if (red < 0) { red = 0; }
@@ -748,9 +675,9 @@
 				if (blue > 255) { blue = 255; }
 				else if (blue < 0) { blue = 0; }
 
-				red2 = (byte)red;
-				green2 = (byte)green;
-				blue2 = (byte)blue;
+				byte red2 = (byte)red;
+				byte green2 = (byte)green;
+				byte blue2 = (byte)blue;
 
 				pixelRowSpan[x] = new Rgba32(red2, green2, blue2, imgSharp[x, y].A);
 			}
@@ -852,47 +779,6 @@
 	}
 
 
-	void Ray(int n1)
-	{
-		int red = 0;
-		byte red2 = 0;
-		int green = 0;
-		byte green2 = 0;
-		int blue = 0;
-		byte blue2 = 0;
-		for (int y = 0; y < imgSharp.Height; y++)
-		{
-			Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
-			for (int x = 0; x < imgSharp.Width; x++)
-			{
-				blue = imgSharp[x, y].B;
-				green = imgSharp[x, y].G;
-				red = imgSharp[x, y].R;
-
-				//int n1 = 230;
-				int n2 = 230;
-				if (blue >= n1 && blue <= n2) { blue += 0; }
-				if (green >= n1 && green <= n2) { green += 0; }
-				if (red >= n1 && red <= n2) { red += 30; }
-
-
-
-
-				if (red > 255) { red = 255; }
-				else if (red < 0) { red = 0; }
-				if (green > 255) { green = 255; }
-				else if (green < 0) { green = 0; }
-				if (blue > 255) { blue = 255; }
-				else if (blue < 0) { blue = 0; }
-
-				red2 = (byte)red;
-				green2 = (byte)green;
-				blue2 = (byte)blue;
-
-				pixelRowSpan[x] = new Rgba32(red2, blue2, blue2, imgSharp[x, y].A);
-			}
-		}
-	}
 
 
 	//WIP, use way 2,
@@ -1178,7 +1064,7 @@
 					{
 						//Make BW + shade way 2
 						int bwcolor = (Gxy_sum_final_Blue + Gxy_sum_final_Green + Gxy_sum_final_Red) / 3;
-						int bwcolor2 = (int)(((imgSharp_original1[x, y].R + imgSharp_original1[x, y].G + imgSharp_original1[x, y].B) / 3) * 1.0);
+						int bwcolor2 = (int)(((imgSharp_original2[x, y].R + imgSharp_original2[x, y].G + imgSharp_original2[x, y].B) / 3) * 1.0);
 						//if (bwcolor2 > 255) { bwcolor = 255; }
 						//if (bwcolor2 < 0) { bwcolor = 0; }
 						//add shade
@@ -1221,15 +1107,15 @@
 
 						////Make shade way 3.2
 						int bwcolor = (Gxy_sum_final_Blue + Gxy_sum_final_Green + Gxy_sum_final_Red) / 3;
-						int bwcolor2 = (int)(((imgSharp_original1[x, y].R + imgSharp_original1[x, y].G + imgSharp_original1[x, y].B) / 3) * 1.0);
+						int bwcolor2 = (int)(((imgSharp_original2[x, y].R + imgSharp_original2[x, y].G + imgSharp_original2[x, y].B) / 3) * 1.0);
 						//if (bwcolor2 > 255) { bwcolor = 255; }
 						//if (bwcolor2 < 0) { bwcolor = 0; }
 						//add shade
 						if (bwcolor2 <= bwcolor && bwcolor2 <= 255)
 						{
-							Gxy_sum_final_Blue = imgSharp_original1[x, y].B;
-							Gxy_sum_final_Green = imgSharp_original1[x, y].G;
-							Gxy_sum_final_Red = imgSharp_original1[x, y].R;
+							Gxy_sum_final_Blue = imgSharp_original2[x, y].B;
+							Gxy_sum_final_Green = imgSharp_original2[x, y].G;
+							Gxy_sum_final_Red = imgSharp_original2[x, y].R;
 						}
 						else
 						{
@@ -1248,7 +1134,7 @@
 						Gxy_sum_final_Green = bwcolor;
 						Gxy_sum_final_Red = bwcolor;
 
-						int bwcolor2 = (((imgSharp_original1[x, y].R + imgSharp_original1[x, y].G + imgSharp_original1[x, y].B) / 3));
+						int bwcolor2 = (((imgSharp_original2[x, y].R + imgSharp_original2[x, y].G + imgSharp_original2[x, y].B) / 3));
 						//add shade
 						if (bwcolor2 <= bwcolor)
 						{
@@ -1305,78 +1191,78 @@
 
 	void Blur()
 	{
-		showprocessing = true;
-		if (displayImage == true)
-		{
+		//showprocessing = true;
+		//if (displayImage == true)
+		//{
 
-			int height = imgSharp.Height - 1;
-			int width = imgSharp.Width - 1; //preivious -1
-
-
-			int num3x3 = 0;
-			int total_Blue = 0;
-			int total_Green = 0;
-			int total_Red = 0;
-			int avg_Blue = 0;
-			int avg_Green = 0;
-			int avg_Red = 0;
+		//	int height = imgSharp.Height - 1;
+		//	int width = imgSharp.Width - 1; //preivious -1
 
 
-			for (int y = 0; y <= height; y++)
-			{
-				Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
-				for (int x = 0; x <= width; x++)
-				{
-
-					num3x3 = 9;
-					total_Blue = 0;
-					total_Green = 0;
-					total_Red = 0;
-					avg_Blue = 0;
-					avg_Green = 0;
-					avg_Red = 0;
-
-					// finding number of valid surrounding pixels in 3x3
-					for (int r = 0; r < 3; r++)
-					{
-
-						for (int c = 0; c < 3; c++)
-						{
-							if (((y + (r - 1) > 0) && (x + (c - 1) > 0)) || ((y + (r - 1) < height) && (x + (c - 1) < width)))
-							{
-								int he = y + (r - 1);
-								int we = x + (c - 1);
-								total_Blue += imgSharp_original2[he, we].B;
-								total_Green += imgSharp_original2[he, we].G;
-								total_Red += imgSharp_original2[he, we].R;
-								continue;
-							}
-
-							if ((y + (r - 1) < 0) || (y + (r - 1) > (height - 1)))
-							{
-								num3x3 -= 1;
-							}
-
-							if ((c + (c - 1) < 0) || (c + (c - 1) > (width - 1)))
-							{
-								num3x3 -= 1;
-							}
-						}
-					}
+		//	int num3x3 = 0;
+		//	int total_Blue = 0;
+		//	int total_Green = 0;
+		//	int total_Red = 0;
+		//	int avg_Blue = 0;
+		//	int avg_Green = 0;
+		//	int avg_Red = 0;
 
 
-					//printf("%i ", num3x3);
-					// should have final number for each j
+		//	for (int y = 0; y <= height; y++)
+		//	{
+		//		Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
+		//		for (int x = 0; x <= width; x++)
+		//		{
 
-					avg_Blue = total_Blue / num3x3;
-					avg_Green = total_Green / num3x3;
-					avg_Red = total_Red / num3x3;
+		//			num3x3 = 9;
+		//			total_Blue = 0;
+		//			total_Green = 0;
+		//			total_Red = 0;
+		//			avg_Blue = 0;
+		//			avg_Green = 0;
+		//			avg_Red = 0;
 
-					pixelRowSpan[x] = new Rgba32(255, 255, 255, imgSharp[x, y].A);
-				}
-			}
-		}
-		showprocessing = false;
+		//			// finding number of valid surrounding pixels in 3x3
+		//			for (int r = 0; r < 3; r++)
+		//			{
+
+		//				for (int c = 0; c < 3; c++)
+		//				{
+		//					if (((y + (r - 1) > 0) && (x + (c - 1) > 0)) || ((y + (r - 1) < height) && (x + (c - 1) < width)))
+		//					{
+		//						int he = y + (r - 1);
+		//						int we = x + (c - 1);
+		//						total_Blue += imgSharp_original2[he, we].B;
+		//						total_Green += imgSharp_original2[he, we].G;
+		//						total_Red += imgSharp_original2[he, we].R;
+		//						continue;
+		//					}
+
+		//					if ((y + (r - 1) < 0) || (y + (r - 1) > (height - 1)))
+		//					{
+		//						num3x3 -= 1;
+		//					}
+
+		//					if ((c + (c - 1) < 0) || (c + (c - 1) > (width - 1)))
+		//					{
+		//						num3x3 -= 1;
+		//					}
+		//				}
+		//			}
+
+
+		//			//printf("%i ", num3x3);
+		//			// should have final number for each j
+
+		//			avg_Blue = total_Blue / num3x3;
+		//			avg_Green = total_Green / num3x3;
+		//			avg_Red = total_Red / num3x3;
+
+		//			pixelRowSpan[x] = new Rgba32(255, 255, 255, imgSharp[x, y].A);
+		//		}
+		//	}
+		//}
+		//showprocessing = false;
 	}
 
 
@@ -1415,16 +1301,21 @@
 			}
 		}
 
-		JS.InvokeVoidAsync("JS_resetsliderposition_Red");
-		JS.InvokeVoidAsync("JS_resetsliderposition_Green");
-		JS.InvokeVoidAsync("JS_resetsliderposition_Blue");
+		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Brightness");
+		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Red");
+		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Green");
+		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Blue");
+
+		//Value_Brightness = 0;
 		//Value_Red = 0;
 		//Value_Green = 0;
 		//Value_Blue = 0;
 
+		//DictV["BrightnessV"] = 0;
 		//DictV["RedV"] = 0;
 		//DictV["GreenV"] = 0;
 		//DictV["BlueV"] = 0;
+
 		foreach (var a in DictV)
 		{
 			DictV[a.Key] = 0;
@@ -1523,7 +1414,6 @@
 				imgSharp_original2 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
 
 				_ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
-				_ip_original = new ImageProcessing_CS(imgSharp, IIF1);
 
 				status = $"Finished loading {imageFile.Size} bytes from {imageFile.Name}";
 
@@ -1592,7 +1482,6 @@
 	//                imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
 
 	//                _ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
-	//                _ip_original = new ImageProcessing_CS(imgSharp, IIF1);
 
 
 	//                status = $"Finished loading {imageFile.Size} bytes from {imageFile.Name}";
