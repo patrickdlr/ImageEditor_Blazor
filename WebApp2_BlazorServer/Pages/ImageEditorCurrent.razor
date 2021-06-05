@@ -322,8 +322,11 @@
 	<p>
 		<div>
 			@*<img class="image_background" src="@_ip_blank.getBase64String_function()" /> not needed*@
+			<img class="image_display" style="width:200px"
+				 src="@imgSharp.ToBase64String(IIF1)" />
 			<img class="image_display"
 				 src="@_ip.getBase64String_function()" />
+
 		</div>
 	</p>
 }
@@ -1323,9 +1326,9 @@
 	}
 
 
-	public void Dispose()
-	{
-	}
+	//public void Dispose()
+	//{
+	//}
 
 
 	string Message = "No file(s) selected";

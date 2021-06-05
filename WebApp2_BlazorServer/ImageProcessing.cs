@@ -4,6 +4,7 @@ using System;
 
 namespace BlazorServerApp1 {
     public class ImageProcessing_CS : IDisposable {
+    //public class ImageProcessing_CS : {
         private Image originalImage;
         private Image editImage;
         private IImageFormat IIF1;
@@ -14,27 +15,29 @@ namespace BlazorServerApp1 {
             this.editImage = image;
         }
 
-        public string getBase64String_function() {
-            return editImage.ToBase64String(IIF1);
-        }
+		public string getBase64String_function()
+		{
+			return editImage.ToBase64String(IIF1);
+		}
 
-        public Image GetImage() {
-            return this.editImage;
-        }
+		//public Image GetImage() {
+		//    return this.editImage;
+		//}
 
-        public void UpdateImage(Image image) {
-            this.editImage = image;
-        }
+		//public void UpdateImage(Image image) {
+		//    this.editImage = image;
+		//}
 
-        public void ResetImage_function() {
-            editImage = originalImage;
-        }
+		//public void ResetImage_function() {
+		//    editImage = originalImage;
+		//}
 
-        public void Dispose() {
-            originalImage.Dispose();
-            editImage.Dispose();
-        }
-    }
+		public void Dispose()
+		{
+			originalImage.Dispose();
+			editImage.Dispose();
+		}
+	}
 
 
 }
