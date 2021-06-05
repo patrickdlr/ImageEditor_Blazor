@@ -1,9 +1,48 @@
 ﻿<h3>Signalr2</h3>
 @page "/Signalr2"
 
+@using BlazorServerApp1; @*project name*@
+@using SixLabors.ImageSharp;
+@using SixLabors.ImageSharp.Formats;
+@using SixLabors.ImageSharp.Processing;
+@using SixLabors.ImageSharp.PixelFormats; @*<rgba32>*@
+@using System;
+@using System.IO;
+@using System.Numerics; @*vector4*@
+
 @using Microsoft.AspNetCore.SignalR.Client
 @inject NavigationManager NavigationManager
 @implements IAsyncDisposable
+
+@using System.Threading.Tasks;
+@using Microsoft.AspNetCore.SignalR;
+
+
+
+<h1>Image Editor</h1>
+
+
+
+
+<form>
+	<figcaption>
+		Upload an image (15 MB max):
+	</figcaption>
+	<InputFile id="Upload an image" OnChange="@UploadFile" />
+</form>
+
+
+@if (displayImage == true)
+{
+	<p>
+		<div>
+			<img class="image_display"
+				 src="@_ip.getBase64String_function()" />
+		</div>
+	</p>
+}
+
+
 
 <div class="form-group">
 	<label>
@@ -31,7 +70,10 @@
 
 
 @code {
+
 	private HubConnection hubConnection;
+
+
 	private List<string> messages = new List<string>();
 	private string userInput;
 	private string messageInput;
@@ -39,7 +81,7 @@
 	protected override async Task OnInitializedAsync()
 	{
 		hubConnection = new HubConnectionBuilder()
-			.WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+			.WithUrl(NavigationManager.ToAbsoluteUri("/Hub1"))
 			.Build();
 
 		hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
@@ -52,6 +94,7 @@
 		await hubConnection.StartAsync();
 	}
 
+
 	async Task Send() =>
 		await hubConnection.SendAsync("SendMessage", userInput, messageInput);
 
@@ -61,5 +104,72 @@
 	public async ValueTask DisposeAsync()
 	{
 		await hubConnection.DisposeAsync();
+	}
+
+
+
+
+
+
+
+	string status = "Sample image";
+	string Error;
+	bool showloading = false;
+	bool showprocessing = false;
+	bool showerror = false;
+	bool displayImage = false;
+	Image<Rgba32> imgSharp;
+	Image<Rgba32> imgSharp_original1;
+	Image<Rgba32> imgSharp_original2;
+	ImageProcessing_CS _ip;
+	IImageFormat IIF1;
+
+
+	string Message = "No file(s) selected";
+	IReadOnlyList<IBrowserFile> selectedFiles;
+	private List<IBrowserFile> loadedFiles = new();
+	private long maxFileSize = 1024 * 15;
+	private int maxAllowedFiles = 1;
+	private bool isLoading;
+	async Task UploadFile(InputFileChangeEventArgs e)
+	{
+		displayImage = false;
+		showerror = false;
+		showloading = true;
+		IBrowserFile imageFile = e.File;
+
+		if (imageFile != null) // blazorinputfile
+		{
+			int maxAllowedSize = 15000000;
+			await using MemoryStream ms = new MemoryStream();
+			await imageFile.OpenReadStream(maxAllowedSize).CopyToAsync(ms);
+
+			try
+			{
+				imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
+				imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
+				imgSharp_original2 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
+
+				_ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
+
+				status = $"Finished loading {imageFile.Size} bytes from {imageFile.Name}";
+
+				showloading = false;
+				displayImage = true;
+				showerror = false;
+			}
+			catch (Exception x)
+			{
+				Error = $"File is not an image (BMP/GIF/JPG/JPEG/PNG/TGA). Try again.";
+				showerror = true;
+				showloading = false;
+			}
+		}
+		else
+		{
+			Error = $"Unknown error occurred. Try again.";
+			showerror = true;
+			showloading = false;
+		}
 	}
 }

@@ -29,6 +29,7 @@ namespace WebApp2_BlazorServer {
             services.AddSingleton<WeatherForecastService>();
 
             //////signalr
+            ///
             services.AddResponseCompression(opts =>
             {
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
@@ -60,7 +61,7 @@ namespace WebApp2_BlazorServer {
 
             app.UseEndpoints(endpoints => {
                 endpoints.MapBlazorHub();
-                endpoints.MapHub<ChatHub>("/chathub"); //////signalr
+                endpoints.MapHub<Hub1>("/Hub1"); //////signalr
                 endpoints.MapFallbackToPage("/_Host");
             });
         }
