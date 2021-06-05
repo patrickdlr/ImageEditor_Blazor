@@ -4,6 +4,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebApp2_BlazorServer.Data;
+using System;
+using System.Linq;
+
+//////signalr
+using Microsoft.AspNetCore.ResponseCompression;
+using BlazorServerSignalRApp.Server.Hubs;
+
+//////signalr
 
 namespace WebApp2_BlazorServer {
     public class Startup {
@@ -19,10 +27,23 @@ namespace WebApp2_BlazorServer {
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
+
+            //////signalr
+            services.AddResponseCompression(opts =>
+            {
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                    new[] { "application/octet-stream" });
+            });
+            //////signalr
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
+
+            app.UseResponseCompression(); //////signalr
+
+
+
             if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             }
@@ -39,6 +60,7 @@ namespace WebApp2_BlazorServer {
 
             app.UseEndpoints(endpoints => {
                 endpoints.MapBlazorHub();
+                endpoints.MapHub<ChatHub>("/chathub"); //////signalr
                 endpoints.MapFallbackToPage("/_Host");
             });
         }
