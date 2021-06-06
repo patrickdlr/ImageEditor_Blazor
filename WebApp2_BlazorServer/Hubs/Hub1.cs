@@ -6,16 +6,26 @@ namespace BlazorServerSignalRApp.Server.Hubs
 {
     public class Hub1 : Hub
 	{
-		public async Task SendMessage(string user, string message)
+		//CHATHUB_STEP2
+		public async Task SendMessage1(string user, string message)
 		{
-			await Clients.All.SendAsync("ReceiveMessage", user, message);
+			//CHATHUB_STEP3
+			await Clients.All.SendAsync("ReceiveMessage2", user, message);
 		}
 
 
-		public async Task UploadFileSR(InputFileChangeEventArgs e)
-		{
-			
-		}
+		//IMGSHARP_STEP2
+		//public async Task UploadFile_HUB(InputFileChangeEventArgs e)
+		//{
+		//	//IMGSHARP_STEP3
+		//	await Clients.All.SendAsync("ReceiveFile_HUB", e);
+		//}
 
+		//IMGSHARP_STEP2
+		public async Task buttonfunction1_send(string e)
+		{
+			//IMGSHARP_STEP3
+			await Clients.All.SendAsync("buttonfunction1_rec", e);
+		}
 	}
 }

@@ -169,12 +169,7 @@
 	//    return Task.CompletedTask;
 	//}
 
-	protected override async Task OnInitializedAsync()
-	{
-		await Task.Delay(1);
-		SomeStartupMethod();
-		//await SomeStartupTask();
-	}
+
 
 	//METHOD TO be called first
 	//METHOD TO be called first
@@ -303,7 +298,7 @@
 	<button class="btn btn-primary" @onclick="(() => Edge(4))">Line C</button>
 	<br />
 
-	<button class="btn btn-primary" @onclick="Blur">Blur</button>
+	<button class="btn btn-primary" @onclick="OilPaint">Oil Paint</button>
 
 	<br />
 	<button class="btn btn-primary" @onclick="Reset">Reset</button>
@@ -365,7 +360,12 @@
 
 
 @code {
-
+	protected override async Task OnInitializedAsync()
+	{
+		await Task.Delay(1);
+		SomeStartupMethod();
+		//await SomeStartupTask();
+	}
 	void ApplyDictVtoBaseImage()
 	{
 		//make imgSharp = imgSharp_original2 (base image) prior to adding incremental filters
@@ -1192,80 +1192,10 @@
 	}
 
 
-	void Blur()
+	async void OilPaint()
 	{
-		//showprocessing = true;
-		//if (displayImage == true)
-		//{
-
-		//	int height = imgSharp.Height - 1;
-		//	int width = imgSharp.Width - 1; //preivious -1
-
-
-		//	int num3x3 = 0;
-		//	int total_Blue = 0;
-		//	int total_Green = 0;
-		//	int total_Red = 0;
-		//	int avg_Blue = 0;
-		//	int avg_Green = 0;
-		//	int avg_Red = 0;
-
-
-		//	for (int y = 0; y <= height; y++)
-		//	{
-		//		Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
-		//		for (int x = 0; x <= width; x++)
-		//		{
-
-		//			num3x3 = 9;
-		//			total_Blue = 0;
-		//			total_Green = 0;
-		//			total_Red = 0;
-		//			avg_Blue = 0;
-		//			avg_Green = 0;
-		//			avg_Red = 0;
-
-		//			// finding number of valid surrounding pixels in 3x3
-		//			for (int r = 0; r < 3; r++)
-		//			{
-
-		//				for (int c = 0; c < 3; c++)
-		//				{
-		//					if (((y + (r - 1) > 0) && (x + (c - 1) > 0)) || ((y + (r - 1) < height) && (x + (c - 1) < width)))
-		//					{
-		//						int he = y + (r - 1);
-		//						int we = x + (c - 1);
-		//						total_Blue += imgSharp_original2[he, we].B;
-		//						total_Green += imgSharp_original2[he, we].G;
-		//						total_Red += imgSharp_original2[he, we].R;
-		//						continue;
-		//					}
-
-		//					if ((y + (r - 1) < 0) || (y + (r - 1) > (height - 1)))
-		//					{
-		//						num3x3 -= 1;
-		//					}
-
-		//					if ((c + (c - 1) < 0) || (c + (c - 1) > (width - 1)))
-		//					{
-		//						num3x3 -= 1;
-		//					}
-		//				}
-		//			}
-
-
-		//			//printf("%i ", num3x3);
-		//			// should have final number for each j
-
-		//			avg_Blue = total_Blue / num3x3;
-		//			avg_Green = total_Green / num3x3;
-		//			avg_Red = total_Red / num3x3;
-
-		//			pixelRowSpan[x] = new Rgba32(255, 255, 255, imgSharp[x, y].A);
-		//		}
-		//	}
-		//}
-		//showprocessing = false;
+		imgSharp.Mutate(x => x.OilPaint());
+		await Flatten();
 	}
 
 
@@ -1432,7 +1362,6 @@
 				//SixLabors.ImageSharp.Formats.Png.PngFormat works with transparency
 				//SixLabors.ImageSharp.Formats.Jpeg.JpegFormat does not
 			}
-
 
 			catch (Exception x)
 			//catch (System.ArgumentException e)

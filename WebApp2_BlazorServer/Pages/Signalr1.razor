@@ -44,7 +44,7 @@
 			.WithUrl(NavigationManager.ToAbsoluteUri("/Hub1"))
 			.Build();
 
-		hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+		hubConnection.On<string, string>("ReceiveMessage2", (user, message) =>
 		{
 			var encodedMsg = $"{user}: {message}";
 			messages.Add(encodedMsg);
@@ -55,7 +55,7 @@
 	}
 
 	async Task Send() =>
-		await hubConnection.SendAsync("SendMessage", userInput, messageInput);
+		await hubConnection.SendAsync("SendMessage1", userInput, messageInput);
 
 	public bool IsConnected =>
 		hubConnection.State == HubConnectionState.Connected;
