@@ -13,19 +13,20 @@ namespace BlazorServerSignalRApp.Server.Hubs
 			await Clients.All.SendAsync("ReceiveMessage2", user, message);
 		}
 
-
-		//IMGSHARP_STEP2
-		//public async Task UploadFile_HUB(InputFileChangeEventArgs e)
-		//{
-		//	//IMGSHARP_STEP3
-		//	await Clients.All.SendAsync("ReceiveFile_HUB", e);
-		//}
-
-		//IMGSHARP_STEP2
-		public async Task buttonfunction1_send(string e)
+		//BUTTON1_STEP2
+		public async Task Edge_signalr1(int i)
 		{
-			//IMGSHARP_STEP3
-			await Clients.All.SendAsync("buttonfunction1_rec", e);
+			//BUTON1_STEP3
+			await Clients.All.SendAsync("Edge_signalr2", i);
 		}
+
+		////IMGSHARP_STEP2
+		public async Task UploadFile_1(InputFileChangeEventArgs e)
+		{
+			////IMGSHARP_STEP3
+			await Clients.All.SendAsync("UploadFile_2", e);
+		}
+
+
 	}
 }
