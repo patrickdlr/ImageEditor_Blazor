@@ -169,7 +169,12 @@
 	//    return Task.CompletedTask;
 	//}
 
-
+	protected override async Task OnInitializedAsync()
+	{
+		await Task.Delay(1);
+		SomeStartupMethod();
+		//await SomeStartupTask();
+	}
 
 	//METHOD TO be called first
 	//METHOD TO be called first
@@ -360,12 +365,7 @@
 
 
 @code {
-	protected override async Task OnInitializedAsync()
-	{
-		await Task.Delay(1);
-		SomeStartupMethod();
-		//await SomeStartupTask();
-	}
+
 	void ApplyDictVtoBaseImage()
 	{
 		//make imgSharp = imgSharp_original2 (base image) prior to adding incremental filters

@@ -72,6 +72,25 @@
 
 
 @code {
+	Dictionary<string, int> DictV = new Dictionary<string, int>();
+
+	void SomeStartupMethod()
+	{
+		// Do Some Work
+		// Make website show uploaded/sample image upon loading
+		imgSharp = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1); // imagesharp
+		imgSharp_original1 = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
+		imgSharp_original2 = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
+
+		_ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
+		displayImage = true;
+
+		DictV.Add("BrightnessV", 0);
+		DictV.Add("RedV", 0);
+		DictV.Add("GreenV", 0);
+		DictV.Add("BlueV", 0);
+	}
+
 
 	private HubConnection hubConnection;
 
@@ -111,6 +130,8 @@
 
 	protected override async Task OnInitializedAsync()
 	{
+		SomeStartupMethod();
+
 		hubConnection = new HubConnectionBuilder()
 			.WithUrl(NavigationManager.ToAbsoluteUri("/Hub1"))
 			.Build();
