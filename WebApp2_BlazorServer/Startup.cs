@@ -9,9 +9,11 @@ using System.Linq;
 
 //////signalr
 using Microsoft.AspNetCore.ResponseCompression;
+/////hubs
 using BlazorServerSignalRApp.Server.Hubs;
+using MoveShape.Hubs;
 
-//////signalr
+
 
 namespace WebApp2_BlazorServer {
     public class Startup {
@@ -60,9 +62,11 @@ namespace WebApp2_BlazorServer {
 
             app.UseRouting();
 
+            app.UseFileServer(); //from moveshape sample program
             app.UseEndpoints(endpoints => {
                 endpoints.MapBlazorHub();
                 endpoints.MapHub<Hub1>("/Hub1"); //////signalr
+                endpoints.MapHub<ShapeHub>("/shapeHub");
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

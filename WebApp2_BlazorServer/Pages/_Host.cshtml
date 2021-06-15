@@ -20,92 +20,133 @@
 	<script src="~/_content/BlazorInputFile/inputfile.js"></script>
 
 
-	@*<script src="_framework/blazor.server.js"></script>*@
-	<script src="_framework/blazor.{webassembly|server}.js"></script>
+	<script src="_framework/blazor.server.js"></script>
+	@*<script src="_framework/blazor.{webassembly|server}.js"></script>*@
+	@*<script>
+			Blazor.defaultReconnectionHandler._reconnectCallback = function (d) {
+				document.location.reload();
+			}
+		</script>*@
+
+
+
 	<script>
-		Blazor.defaultReconnectionHandler._reconnectCallback = function (d) {
-			document.location.reload();
+
+		//example
+		//window.displayTickerAlert1 = (symbol, price) => {
+		//    alert(`${symbol}: $${price}!`);
+		//};
+
+
+		//reset slider positions (incremental filters) to 0
+		window.JS_resetsliderpositionandtextvalue_Brightness = () => {
+			document.getElementById('slider_Brightness').value = 0;
+			document.getElementById('text_Brightness').value = 0
+		};
+		window.JS_resetsliderpositionandtextvalue_Red = () => {
+			document.getElementById('slider_Red').value = 0;
+			document.getElementById('text_Red').value = 0;
+		};
+		window.JS_resetsliderpositionandtextvalue_Green = () => {
+			document.getElementById('slider_Green').value = 0;
+			document.getElementById('text_Green').value = 0;
+
+		};
+		window.JS_resetsliderpositionandtextvalue_Blue = () => {
+			document.getElementById('slider_Blue').value = 0;
+			document.getElementById('text_Blue').value = 0;
+		};
+
+
+		//reset slider positions (incremental filters) if user adds new input to text field or slider
+		window.JS_changesliderpositionandtextvalue_Brightness = (n) => {
+			document.getElementById('slider_Brightness').value = n;
+			document.getElementById('text_Brightness').value = n
+		};
+		window.JS_changesliderpositionandtextvalue_Red = (n) => {
+			document.getElementById("slider_Red").value = n;
+			document.getElementById('text_Red').value = n
+		};
+		window.JS_changesliderpositionandtextvalue_Green = (n) => {
+			document.getElementById('slider_Green').value = n;
+			document.getElementById("text_Green").value = n;
+
+		};
+		window.JS_changesliderpositionandtextvalue_Blue = (n) => {
+			document.getElementById('slider_Blue').value = n;
+			document.getElementById("text_Blue").value = n;
+		};
+
+
+	</script>
+
+
+
+
+	<script type="text/javascript" src="lib/signalr.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.2.1.js"
+			integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+			crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"
+			integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30="
+			crossorigin="anonymous"></script>
+	<title>MoveShape</title>
+	<style>
+		#shape {
+			width: 100px;
+			height: 100px;
+			background-color: red;
+			cursor: move;
 		}
-	</script>
+	</style>
 
 
 
-	<script>
 
-        //example
-        //window.displayTickerAlert1 = (symbol, price) => {
-        //    alert(`${symbol}: $${price}!`);
-        //};
-
-
-        //reset slider positions (incremental filters) to 0
-        window.JS_resetsliderpositionandtextvalue_Brightness = () => {
-            document.getElementById('slider_Brightness').value = 0;
-            document.getElementById('text_Brightness').value = 0
-        };
-        window.JS_resetsliderpositionandtextvalue_Red = () => {
-            document.getElementById('slider_Red').value = 0;
-            document.getElementById('text_Red').value = 0;
-        };
-        window.JS_resetsliderpositionandtextvalue_Green = () => {
-            document.getElementById('slider_Green').value = 0;
-            document.getElementById('text_Green').value = 0;
-
-        };
-        window.JS_resetsliderpositionandtextvalue_Blue = () => {
-            document.getElementById('slider_Blue').value = 0;
-            document.getElementById('text_Blue').value = 0;
-        };
-
-
-        //reset slider positions (incremental filters) if user adds new input to text field or slider
-        window.JS_changesliderpositionandtextvalue_Brightness = (n) => {
-            document.getElementById('slider_Brightness').value = n;
-            document.getElementById('text_Brightness').value = n
-        };
-        window.JS_changesliderpositionandtextvalue_Red = (n) => {
-            document.getElementById("slider_Red").value = n;
-            document.getElementById('text_Red').value = n
-        };
-        window.JS_changesliderpositionandtextvalue_Green = (n) => {
-            document.getElementById('slider_Green').value = n;
-            document.getElementById("text_Green").value = n;
-
-        };
-        window.JS_changesliderpositionandtextvalue_Blue = (n) => {
-            document.getElementById('slider_Blue').value = n;
-            document.getElementById("text_Blue").value = n;
-        };
-
-
-	</script>
 </head>
 <body>
-    <component type="typeof(App)" render-mode="ServerPrerendered" />
+	<component type="typeof(App)" render-mode="ServerPrerendered" />
 
-    @*<div id="blazor-error-ui">
-        <environment include="Staging,Production">
-            An error has occurred. This application may no longer respond until reloaded.
-        </environment>
-        <environment include="Development">
-            An unhandled exception has occurred. See browser dev tools for details.
-        </environment>
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>*@
+	@*<div id="blazor-error-ui">
+			<environment include="Staging,Production">
+				An error has occurred. This application may no longer respond until reloaded.
+			</environment>
+			<environment include="Development">
+				An unhandled exception has occurred. See browser dev tools for details.
+			</environment>
+			<a href="" class="reload">Reload</a>
+			<a class="dismiss">🗙</a>
+		</div>*@
 
 
-    @*<script>
-        //For Hot Reload
-        //dotnet watch run debug
-        window.Blazor.defaultReconnectionHandler.onConnectionDown = function ()
-        {
-            setTimeout(function () {
-            location.reload();
-            }, 5000);
-        };
-    </script>*@
-    
+	@*<script>
+			//For Hot Reload
+			//dotnet watch run debug
+			window.Blazor.defaultReconnectionHandler.onConnectionDown = function ()
+			{
+				setTimeout(function () {
+				location.reload();
+				}, 5000);
+			};
+		</script>*@
+
 	<script src="_framework/blazor.server.js"></script>
+
+	<script>
+        $shape = $("#shape");
+        var connection = new signalR.HubConnectionBuilder().withUrl('/shapeHub').build();
+
+        connection.on('shapeMoved', function(x, y) {
+            $shape.css({ left: x, top: y });
+        });
+
+        connection.start().then(
+            $shape.draggable({
+                drag: function () {
+                    connection.invoke("MoveShape", this.offsetLeft, this.offsetTop || 0);
+                }
+            })
+        );
+	</script>
 </body>
 </html>
