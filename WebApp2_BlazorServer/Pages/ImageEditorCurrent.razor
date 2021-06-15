@@ -360,7 +360,7 @@
 		BlueV_undo.Add(DictV["BlueV"]);
 
 		////1.3 (limit undo lists' count to num_limit) (unique code block)
-		int num_limit = 10;
+		int num_limit = 3;
 		if (imgSharplist_undo.Count > num_limit) { imgSharplist_undo.RemoveAt(0); }
 		if (IncV_undo.Count > num_limit) { IncV_undo.RemoveAt(0); }
 		if (BrightnessV_undo.Count > num_limit) { BrightnessV_undo.RemoveAt(0); }
