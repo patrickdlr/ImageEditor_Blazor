@@ -40,7 +40,7 @@
 	//add button to scroll webpage to exact point for you (helps people scroll to image quickly without using their hands)
 	//prevent webpage from resetting when exiting or clicking on other tab/button/link, aka keep the state same for x hours maximum
 	//add photo compression percentage (for faster processing, and lower quality)
-	//add gamma besides brightness, contrast
+	//add gamma, incremental invert, besides brightness, contrast
 
 
 	//SUGGESTED FEATURES FOR IMAGE EDITOR (logic)
@@ -147,7 +147,9 @@
 
 	string infolog1;
 	string infolog2;
-
+	double brushsize = 0;
+	int imgSharpvHeight =0;
+	int imgSharpvWidth =0;
 	//METHOD TO be called first
 	//METHOD TO be called first
 
@@ -158,6 +160,7 @@
 		imgSharp = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1); // imagesharp
 		imgSharp_original1 = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
 		imgSharp_original2 = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
+		imgSharpvHeight = imgSharp.Height; imgSharpvWidth = imgSharp.Width;
 
 		_ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
 		displayImage = true;
@@ -188,6 +191,11 @@
 <div>
 	@infolog1<br />
 	@infolog2<br />
+
+	Height: @imgSharpvHeight<br />
+	Width: @imgSharpvWidth<br />
+	Brushsize for OilPaint: @brushsize<br />
+
 </div>
 
 <form>
@@ -230,10 +238,11 @@
 
 
 	<button class="btn btn-primary" @onclick="(() => Edge(0))">Line A</button>
+	<button class="btn btn-primary" @onclick="(() => Edge(10))">Line B</button>
 	@*<button class="btn btn-primary" @onclick="(() => Edge(1))">Line B</button>*@
-	<button class="btn btn-primary" @onclick="(() => Edge(2))">Line B</button>
+	<button class="btn btn-primary" @onclick="(() => Edge(2))">Line C</button>
 	@*<button class="btn btn-primary" @onclick="(() => Edge(3))">Line </button>*@
-	<button class="btn btn-primary" @onclick="(() => Edge(4))">Line C</button>
+	<button class="btn btn-primary" @onclick="(() => Edge(4))">Line D</button>
 	<button class="btn btn-primary" @onclick="Grayscale">Grayscale</button>
 	<button class="btn btn-primary" @onclick="GaussianBlur">GaussianBlur</button>
 	<button class="btn btn-primary" @onclick="OilPaint">Oil Paint</button>
@@ -248,7 +257,7 @@
 	<div class="slidecontainer">
 		@*using javascript function to change input values*@
 		Contrast<br />
-		<input type="range" class="slider" id="slider_Contrast" min="-1" max="1" step="0.1" value="0" @onchange="Onchange_Slider_Contrast">
+		<input type="range" class="slider" id="slider_Contrast" min="-1" max="1" step="0.0025" value="0" @onchange="Onchange_Slider_Contrast">
 		<input type="text" id="text_Contrast" style="width: 100px;" value="0" @onchange="Onchange_Slider_Contrast">
 		<br />
 
@@ -330,8 +339,8 @@
 		infolog1 = "imgSharplist_undo.Count: " + imgSharplist_undo.Count.ToString();
 		infolog2 = "imgSharplist_redo.Count: " + imgSharplist_redo.Count.ToString();
 		Debug.WriteLine(infolog1);
-		Debug.WriteLine("");
 		Debug.WriteLine(infolog2);
+		Debug.WriteLine(brushsize);
 	}
 
 	//incremental filters - BEG
@@ -393,9 +402,10 @@
 				Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
 				for (int x = 0; x < imgSharp.Width; x++)
 				{
-					double red = input_value * imgSharp[x, y].R + 1/ input_value;
-					double green = input_value * imgSharp[x, y].G + 1 / input_value;
-					double blue = input_value * imgSharp[x, y].B + 1 / input_value;
+					double brightness_adjustment = (1-input_value) * 128; //if contrast higher, then lower brightness. vice versa.
+					double red = input_value * imgSharp[x, y].R + brightness_adjustment;
+					double green = input_value * imgSharp[x, y].G + brightness_adjustment;
+					double blue = input_value * imgSharp[x, y].B + brightness_adjustment;
 
 					if (red > 255) { red = 255; }
 					else if (red < 0) { red = 0; }
@@ -730,18 +740,27 @@
 
 	void Filter1()
 	{
+		ClearRedo();                   //0.8
+		is_FilterIncremental = false;  //0.9
+		SaveAttributesToUndoLists();   //1-1.4
 
+		////2 (reset incremental filter attributes when user uses non-incremental filter)
+		foreach (var a in DictV)
+		{
+			DictV[a.Key] = 0;
+		}
 
-		//
+		////3
+		imgSharp.Mutate(ctx => ctx.Lomograph());
+		//imgSharp.Mutate(ctx => ctx.Quantize());
+		//imgSharp.Mutate(ctx => ctx.HistogramEqualization());
 
-
+		////4 affix
+		Flatten_nosavingtoundo();
 	}
 
 	public void Filter2()
 	{
-
-
-
 		ClearRedo();                   //0.8
 		is_FilterIncremental = false;  //0.9
 		SaveAttributesToUndoLists();   //1-1.4
@@ -756,7 +775,6 @@
 		imgSharp.Mutate(ctx => ctx.HistogramEqualization());
 		//imgSharp.Mutate(ctx => ctx.Quantize());
 		//imgSharp.Mutate(ctx => ctx.Lomograph());
-		//imgSharp.Mutate(ctx => ctx.GaussianBlur(1));
 
 		////4 affix
 		Flatten_nosavingtoundo();
@@ -905,8 +923,13 @@
 
 
 			//prewitt
+			if (parameter1 == 10)
+			{
+			OilPaint();
+			}
 
-			if (parameter1 == 0)
+
+			if (parameter1 == 0 || parameter1 == 10)
 			{
 				//sobel
 				array_gx[0, 0] = -1; array_gx[0, 1] = 0; array_gx[0, 2] = 1;
@@ -1084,7 +1107,7 @@
 
 					//////custom color background
 					int cutoff = 15; //should try make a slider ouit of this //IDEA1 //make alpha=0 background //30, 45, 60, 75
-					if (parameter1 == 1) { cutoff = 60; }
+					if (parameter1 == 1) { cutoff = 60; } //30, 45, 60, 75// previously 60
 					if (Gxy_sum_final_Blue <= cutoff && Gxy_sum_final_Green <= cutoff && Gxy_sum_final_Red <= cutoff)
 					{
 
@@ -1158,7 +1181,7 @@
 
 					//No BW and/or shade way 0
 
-					if (parameter1 == 1 || parameter1 == 0)
+					if (parameter1 == 1 || parameter1 == 0 || parameter1 == 10)
 					{
 						////Make BW only way 1
 						int bwcolor = (Gxy_sum_final_Blue + Gxy_sum_final_Green + Gxy_sum_final_Red) / 3;
@@ -1310,8 +1333,10 @@
 		}
 
 		////3
-		imgSharp.Mutate(x => x.OilPaint());
-
+		brushsize = (imgSharp.Width * imgSharp.Height) * .000004;
+		if (brushsize <= 6) { brushsize = 6; }
+		imgSharp.Mutate(x => x.OilPaint(20, (int)brushsize));
+		////public static IImageProcessingContext OilPaint(this IImageProcessingContext source, int levels, int brushSize);
 		////4 affix
 		Flatten_nosavingtoundo(); //no savetoundo
 
@@ -1687,6 +1712,7 @@
 				imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
 				imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
 				imgSharp_original2 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
+				imgSharpvHeight = imgSharp.Height; imgSharpvWidth = imgSharp.Width;
 
 				_ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
 
