@@ -37,11 +37,15 @@
 		//    alert(`${symbol}: $${price}!`);
 		//};
 
-
+		//reset slider positions (incremental filters) to 0
+		window.JS_resetsliderpositionandtextvalue_Contrast = () => {
+			document.getElementById('slider_Contrast').value = 0;
+			document.getElementById('text_Contrast').value = 0;
+		};
 		//reset slider positions (incremental filters) to 0
 		window.JS_resetsliderpositionandtextvalue_Brightness = () => {
 			document.getElementById('slider_Brightness').value = 0;
-			document.getElementById('text_Brightness').value = 0
+			document.getElementById('text_Brightness').value = 0;
 		};
 		window.JS_resetsliderpositionandtextvalue_Red = () => {
 			document.getElementById('slider_Red').value = 0;
@@ -59,13 +63,17 @@
 
 
 		//reset slider positions (incremental filters) if user adds new input to text field or slider
+		window.JS_changesliderpositionandtextvalue_Contrast = (n) => {
+			document.getElementById('slider_Contrast').value = n;
+			document.getElementById('text_Contrast').value = n;
+		};
 		window.JS_changesliderpositionandtextvalue_Brightness = (n) => {
 			document.getElementById('slider_Brightness').value = n;
-			document.getElementById('text_Brightness').value = n
+			document.getElementById('text_Brightness').value = n;
 		};
 		window.JS_changesliderpositionandtextvalue_Red = (n) => {
 			document.getElementById("slider_Red").value = n;
-			document.getElementById('text_Red').value = n
+			document.getElementById('text_Red').value = n;
 		};
 		window.JS_changesliderpositionandtextvalue_Green = (n) => {
 			document.getElementById('slider_Green').value = n;

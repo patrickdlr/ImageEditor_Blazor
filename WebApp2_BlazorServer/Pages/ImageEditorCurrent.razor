@@ -110,31 +110,30 @@
 	bool showerror = false;
 	bool displayImage = false;
 
-	int Value_Contrast = 0;
 
 	Image<Rgba32> imgSharp;
 	Image<Rgba32> imgSharp_original1; //used by reset
 	Image<Rgba32> imgSharp_original2; //used by darken/brighten
 
-	Dictionary<string, int> DictV = new Dictionary<string, int>();
+	Dictionary<string, double> DictV = new Dictionary<string, double>();
 
 	List<Image<Rgba32>> imgSharplist_undo = new List<Image<Rgba32>>();
 	List<Image<Rgba32>> imgSharplist_redo = new List<Image<Rgba32>>();
 
-	List<int> IncV_undo = new List<int>(); //0 = false, 1 = true
-	List<int> IncV_redo = new List<int>();
-	List<int> BrightnessV_undo = new List<int>();
-	List<int> BrightnessV_redo = new List<int>();
-	List<int> ContrastV_undo = new List<int>();
-	List<int> ContrastV_redo = new List<int>();
-	List<int> OpacityV_undo = new List<int>();
-	List<int> OpacityV_redo = new List<int>();
-	List<int> RedV_undo = new List<int>();
-	List<int> RedV_redo = new List<int>();
-	List<int> GreenV_undo = new List<int>();
-	List<int> GreenV_redo = new List<int>();
-	List<int> BlueV_undo = new List<int>();
-	List<int> BlueV_redo = new List<int>();
+	List<double> IncV_undo = new List<double>(); //0 = false, 1 = true
+	List<double> IncV_redo = new List<double>();
+	List<double> ContrastV_undo = new List<double>();
+	List<double> ContrastV_redo = new List<double>();
+	List<double> BrightnessV_undo = new List<double>();
+	List<double> BrightnessV_redo = new List<double>();
+	List<double> OpacityV_undo = new List<double>();
+	List<double> OpacityV_redo = new List<double>();
+	List<double> RedV_undo = new List<double>();
+	List<double> RedV_redo = new List<double>();
+	List<double> GreenV_undo = new List<double>();
+	List<double> GreenV_redo = new List<double>();
+	List<double> BlueV_undo = new List<double>();
+	List<double> BlueV_redo = new List<double>();
 
 	bool is_FilterIncremental = false;
 
@@ -146,12 +145,12 @@
 	//IImageFormat IIF2 = SixLabors.ImageSharp.Formats.Png.PngFormat;
 
 
-
-
-
+	string infolog1;
+	string infolog2;
 
 	//METHOD TO be called first
 	//METHOD TO be called first
+
 	void SomeStartupMethod()
 	{
 		// Do Some Work
@@ -164,8 +163,8 @@
 		displayImage = true;
 
 		DictV.Add("IncV", 0); //0 = false, 1 = true
-		DictV.Add("BrightnessV", 0);
 		DictV.Add("ContrastV", 0);
+		DictV.Add("BrightnessV", 0);
 		DictV.Add("OpacityV", 0);
 		DictV.Add("RedV", 0);
 		DictV.Add("GreenV", 0);
@@ -181,90 +180,53 @@
 	//METHOD TO be called first
 	//METHOD TO be called first
 
-
 }
-
-
 
 
 <h1>Image Editor</h1>
 
-
-
+<div>
+	@infolog1<br />
+	@infolog2<br />
+</div>
 
 <form>
 	<figcaption>
 		Upload an image (15 MB max):
 	</figcaption>
 	<InputFile id="Upload an image" OnChange="@UploadFile" />
-	@*<InputFile OnChange="@OnInputFileChange" />*@
+
 	@*<p>Upload an image (OLD): <InputFile OnChange="HandleFileSelected_function" /></p>*@
 	@*only available in Net 5.0, so use net 5.0 and ensure that ur fully migrated to net 5.0~!!!!*@
-
-	@*<InputFile />
-		<button type="submit">Upload Selected File(s)</button>*@
 	@*<input multiple="" type="file" _bl_2="">*@
 </form>
 
 
-
-
 <div>
 	@if (showloading == true)
-	{
-		<p style="color:greenyellow">Uploading...</p>}
-	@if (showprocessing == true)
-	{
-		<p style="color:darkorange">Processing...</p>}
-	@if (showerror == true)
-	{
-		<p style="color:red">@Error</p>}
+	{<p style="color:greenyellow">Uploading...</p>}
 	@if (showloading == false)
-	{
-		<p>@status</p>}
+	{<p>@status</p>}
+	@if (showprocessing == true)
+	{<p style="color:darkorange">Processing...</p>}
+	@if (showerror == true)
+	{<p style="color:red">@Error</p>}
 </div>
-
-
 
 
 <div>
 	<figcaption>Filters (more to be added): </figcaption>
 
-	<button class="btn btn-primary" @onclick="Flatten">Flatten</button>
+	<button class="btn btn-primary" @onclick="InformationLog">Log List</button>
 
 
-	<div class="slidecontainer">
-		@*using javascript function to change input values*@
-		Brightness<br />
-		<input type="range" class="slider" id="slider_Brightness" min="-255" max="255" value="0" @onchange="Onchange_Slider_Brightness">
-		<input type="text" id="text_Brightness" style="width: 69px;" value="0" @onchange="Onchange_Slider_Brightness">
-		<br />
-
-		Red<br />
-		<input type="range" class="slider" id="slider_Red" min="-255" max="255" value="0" @onchange="Onchange_Slider_Red">
-		<input type="text" id="text_Red" style="width: 69px;" value="0" @onchange="Onchange_Slider_Red">
-		<br />
-
-		Green<br />
-		<input type="range" class="slider" id="slider_Green" min="-255" max="255" value="0" @onchange="Onchange_Slider_Green">
-		<input type="text" id="text_Green" style="width: 69px;" value="0" @onchange="Onchange_Slider_Green">
-		<br />
-
-		Blue<br />
-		<input type="range" class="slider" id="slider_Blue" min="-255" max="255" value="0" @onchange="Onchange_Slider_Blue">
-		<input type="text" id="text_Blue" style="width: 69px;" value="0" @onchange="Onchange_Slider_Blue">
-		<br />
-	</div>
-
-
-
-	<button class="btn btn-primary" @onclick="ContrastUp">Contrast (+)</button>
-	<button class="btn btn-primary" @onclick="ContrastDown">Contrast (-)</button>
+	@*filters to fix*@
+	<button class="btn btn-primary" @onclick="Filter1">Filter1</button>
+	<button class="btn btn-primary" @onclick="Filter2">Filter2</button>
 	@*<button class="btn btn-primary" @onclick="OpacityUP">Opacity (+)</button>
 		<button class="btn btn-primary" @onclick="OpacityDOWN">Opacity (-)</button>
 		Note: Opacity adjustment only works on PNG, not JPG/JPEG, for now.
-		<br />
-	*@
+		<br />*@
 
 
 	<button class="btn btn-primary" @onclick="(() => Edge(0))">Line A</button>
@@ -272,19 +234,51 @@
 	<button class="btn btn-primary" @onclick="(() => Edge(2))">Line B</button>
 	@*<button class="btn btn-primary" @onclick="(() => Edge(3))">Line </button>*@
 	<button class="btn btn-primary" @onclick="(() => Edge(4))">Line C</button>
-	<br />
-
 	<button class="btn btn-primary" @onclick="Grayscale">Grayscale</button>
 	<button class="btn btn-primary" @onclick="GaussianBlur">GaussianBlur</button>
 	<button class="btn btn-primary" @onclick="OilPaint">Oil Paint</button>
 	<br />
 
+	<button class="btn btn-primary" @onclick="Undo">Undo</button>
+	<button class="btn btn-primary" @onclick="Redo">Redo</button>
 	<button class="btn btn-primary" @onclick="Reset">Reset</button>
 	<br />
 
-	<button class="btn btn-primary" @onclick="Undo">Undo</button>
-	<button class="btn btn-primary" @onclick="Redo">Redo</button>
-	<br />
+
+	<div class="slidecontainer">
+		@*using javascript function to change input values*@
+		Contrast<br />
+		<input type="range" class="slider" id="slider_Contrast" min="-1" max="1" step="0.1" value="0" @onchange="Onchange_Slider_Contrast">
+		<input type="text" id="text_Contrast" style="width: 100px;" value="0" @onchange="Onchange_Slider_Contrast">
+		<br />
+
+		Brightness<br />
+		<input type="range" class="slider" id="slider_Brightness" min="-255" max="255" value="0" @onchange="Onchange_Slider_Brightness">
+		<input type="text" id="text_Brightness" style="width: 100px;" value="0" @onchange="Onchange_Slider_Brightness">
+		<br />
+
+		Red<br />
+		<input type="range" class="slider" id="slider_Red" min="-255" max="255" value="0" @onchange="Onchange_Slider_Red">
+		<input type="text" id="text_Red" style="width: 100px;" value="0" @onchange="Onchange_Slider_Red">
+		<br />
+
+		Green<br />
+		<input type="range" class="slider" id="slider_Green" min="-255" max="255" value="0" @onchange="Onchange_Slider_Green">
+		<input type="text" id="text_Green" style="width: 100px;" value="0" @onchange="Onchange_Slider_Green">
+		<br />
+
+		Blue<br />
+		<input type="range" class="slider" id="slider_Blue" min="-255" max="255" value="0" @onchange="Onchange_Slider_Blue">
+		<input type="text" id="text_Blue" style="width: 100px;" value="0" @onchange="Onchange_Slider_Blue">
+		<br />
+
+		<button class="btn btn-primary" @onclick="Flatten">Flatten</button>
+		<br />
+	</div>
+
+
+
+
 </div>
 
 
@@ -294,10 +288,10 @@
 {
 	<p>
 		<div>
-			<img class="image_display" style="width:200px"
-				 src="@imgSharp.ToBase64String(IIF1)" />
+			@*<img class="image_display"
+				 src="@_ip.getBase64String_function()" />*@
 			<img class="image_display"
-				 src="@_ip.getBase64String_function()" />
+				 src="@imgSharp.ToBase64String(IIF1)" />
 		</div>
 	</p>
 }
@@ -331,71 +325,23 @@
 
 @code {
 
-	//incremental filters
-	//incremental filters
-
-	void SaveAttributesToUndoLists() //1-1.4
+	void InformationLog()
 	{
-		////1
-		////saving imgSharp_original2 to imgSharplist_undo list:
-		Image<Rgba32> imgSharp_temporary = new Image<Rgba32>(imgSharp.Width, imgSharp.Height);
-		for (int y = 0; y < imgSharp_temporary.Height; y++)
-		{
-			//Span<Rgba32> pixelRowSpan = imgSharp_temporary.GetPixelRowSpan(y);
-			for (int x = 0; x < imgSharp_temporary.Width; x++)
-			{
-				imgSharp_temporary[x, y] = new Rgba32(imgSharp_original2[x, y].R, imgSharp_original2[x, y].G, imgSharp_original2[x, y].B, imgSharp_original2[x, y].A);
-			}
-		}
-		imgSharplist_undo.Add(imgSharp_temporary);
-
-		////1.2
-		////saving incremental filter attributes to undo lists
-		IncV_undo.Add(DictV["IncV"]);
-		BrightnessV_undo.Add(DictV["BrightnessV"]);
-		ContrastV_undo.Add(DictV["ContrastV"]);
-		OpacityV_undo.Add(DictV["OpacityV"]);
-		RedV_undo.Add(DictV["RedV"]);
-		GreenV_undo.Add(DictV["GreenV"]);
-		BlueV_undo.Add(DictV["BlueV"]);
-
-		////1.3 (limit undo lists' count to num_limit) (unique code block)
-		int num_limit = 3;
-		if (imgSharplist_undo.Count > num_limit) { imgSharplist_undo.RemoveAt(0); }
-		if (IncV_undo.Count > num_limit) { IncV_undo.RemoveAt(0); }
-		if (BrightnessV_undo.Count > num_limit) { BrightnessV_undo.RemoveAt(0); }
-		if (ContrastV_undo.Count > num_limit) { ContrastV_undo.RemoveAt(0); }
-		if (OpacityV_undo.Count > num_limit) { OpacityV_undo.RemoveAt(0); }
-		if (RedV_undo.Count > num_limit) { RedV_undo.RemoveAt(0); }
-		if (GreenV_undo.Count > num_limit) { GreenV_undo.RemoveAt(0); }
-		if (BlueV_undo.Count > num_limit) { BlueV_undo.RemoveAt(0); }
-
-		////1.4 (put this on undo/redo)?
-		if (DictV["IncV"] == 1 && is_FilterIncremental == false)
-			Flatten();
-
-
+		infolog1 = "imgSharplist_undo.Count: " + imgSharplist_undo.Count.ToString();
+		infolog2 = "imgSharplist_redo.Count: " + imgSharplist_redo.Count.ToString();
+		Debug.WriteLine(infolog1);
+		Debug.WriteLine("");
+		Debug.WriteLine(infolog2);
 	}
 
+	//incremental filters - BEG
+	//incremental filters
+	//incremental filters
+	//incremental filters
 
-	void ClearRedo()
+
+	void ApplyBaseImageAndIncrementalFiltersToCurrentImage()
 	{
-		List<Image<Rgba32>> imgSharplist_redo = new List<Image<Rgba32>>();
-		List<int> IncV_redo = new List<int>();
-		List<int> BrightnessV_redo = new List<int>();
-		List<int> ContrastV_redo = new List<int>();
-		List<int> OpacityV_redo = new List<int>();
-		List<int> RedV_redo = new List<int>();
-		List<int> GreenV_redo = new List<int>();
-		List<int> BlueV_redo = new List<int>();
-	}
-
-	void ApplyDictVtoBaseImage()
-	{
-
-
-
-
 		////3 edit image
 		////3 edit image
 		////make imgSharp = imgSharp_original2 (base image) prior to adding incremental filters
@@ -407,38 +353,71 @@
 				pixelRowSpan[x] = new Rgba32(imgSharp_original2[x, y].R, imgSharp_original2[x, y].G, imgSharp_original2[x, y].B, imgSharp_original2[x, y].A);
 			}
 		}
-
 		////adding incremental filters - try to make the codes shorter
 		foreach (var a in DictV)
 		{
+			if (a.Key == "ContrastV")
+			{
+				Contrast(a.Value); //0.0-3.0
+			}
 			if (a.Key == "BrightnessV")
 			{
-				Brightness(a.Value);
+				Brightness((int)a.Value);
 			}
 			if (a.Key == "RedV")
 			{
-				Red(a.Value);
+				Red((int)a.Value);
 			}
 			if (a.Key == "GreenV")
 			{
-				Green(a.Value);
+				Green((int)a.Value);
 			}
 			if (a.Key == "BlueV")
 			{
-				Blue(a.Value);
+				Blue((int)a.Value);
 			}
 		}
 		//3 edit image
 		//3 edit image
-
-
-
-
 	}
-
 
 	//pixel manipulation way 2 //(storing variable)
-	public void Brightness(int val)
+	public void Contrast(double input_value)
+	{
+		if (displayImage == true)
+		{
+			input_value += 1; //adjust to neutral value (appears 0 to users, but uses 1 as neutral multiplication value)
+
+			for (int y = 0; y < imgSharp.Height; y++)
+			{
+				Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
+				for (int x = 0; x < imgSharp.Width; x++)
+				{
+					double red = input_value * imgSharp[x, y].R + 1/ input_value;
+					double green = input_value * imgSharp[x, y].G + 1 / input_value;
+					double blue = input_value * imgSharp[x, y].B + 1 / input_value;
+
+					if (red > 255) { red = 255; }
+					else if (red < 0) { red = 0; }
+					if (green > 255) { green = 255; }
+					else if (green < 0) { green = 0; }
+					if (blue > 255) { blue = 255; }
+					else if (blue < 0) { blue = 0; }
+
+					byte red2 = (byte)red;
+					byte green2 = (byte)green;
+					byte blue2 = (byte)blue;
+
+					pixelRowSpan[x] = new Rgba32(red2, green2, blue2, imgSharp[x, y].A);
+				}
+			}
+
+			//TO DO
+		}
+	}
+
+	//pixel manipulation way 2 //(storing variable)
+	public void Brightness(int input_value)
 	{
 		if (displayImage == true)
 		{
@@ -447,9 +426,9 @@
 				Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
 				for (int x = 0; x < imgSharp.Width; x++)
 				{
-					int red = imgSharp[x, y].R + val;
-					int green = imgSharp[x, y].G + val;
-					int blue = imgSharp[x, y].B + val;
+					int red = imgSharp[x, y].R + input_value;
+					int green = imgSharp[x, y].G + input_value;
+					int blue = imgSharp[x, y].B + input_value;
 
 					if (red > 255) { red = 255; }
 					else if (red < 0) { red = 0; }
@@ -472,7 +451,7 @@
 
 
 	//pixel manipulation way 2 (using stored variable (byte))
-	void Red(int val)
+	void Red(int input_value)
 	{
 		if (displayImage == true)
 		{
@@ -481,7 +460,7 @@
 				Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
 				for (int x = 0; x < imgSharp.Width; x++)
 				{
-					int red = imgSharp[x, y].R + val;
+					int red = imgSharp[x, y].R + input_value;
 					int green = imgSharp[x, y].G;
 					int blue = imgSharp[x, y].B;
 
@@ -505,7 +484,7 @@
 
 
 	//pixel manipulation way 2 (using stored variable (byte))
-	void Green(int val)
+	void Green(int input_value)
 	{
 		if (displayImage == true)
 		{
@@ -515,7 +494,7 @@
 				for (int x = 0; x < imgSharp.Width; x++)
 				{
 					int red = imgSharp[x, y].R;
-					int green = imgSharp[x, y].G + val;
+					int green = imgSharp[x, y].G + input_value;
 					int blue = imgSharp[x, y].B;
 
 					if (red > 255) { red = 255; }
@@ -537,7 +516,7 @@
 	}
 
 	//pixel manipulation way 2 (using stored variable (byte))
-	void Blue(int val)
+	void Blue(int input_value)
 	{
 		if (displayImage == true)
 		{
@@ -548,7 +527,7 @@
 				{
 					int red = imgSharp[x, y].R;
 					int green = imgSharp[x, y].G;
-					int blue = imgSharp[x, y].B + val;
+					int blue = imgSharp[x, y].B + input_value;
 
 					if (red > 255) { red = 255; }
 					else if (red < 0) { red = 0; }
@@ -569,70 +548,219 @@
 	}
 
 
-
-	void ContrastUp()
+	void Onchange_Slider_Contrast(ChangeEventArgs e)
 	{
-		////imgSharp.Mutate(ctx => ctx.Polaroid());
-		//imgSharp.Mutate(ctx => ctx.Contrast((float)1.1));
+		ClearRedo();                   //0.8
+		is_FilterIncremental = true;   //0.9
+		SaveAttributesToUndoLists();   //1-1.4
 
-		////imgSharp_original2 = imgSharp.Clone();
-		////OR
-
-		//for (int y = 0; y < imgSharp_original2.Height; y++)
-		//{
-		//	Span<Rgba32> pixelRowSpan = imgSharp_original2.GetPixelRowSpan(y);
-		//	for (int x = 0; x < imgSharp_original2.Width; x++)
-		//	{
-		//		pixelRowSpan[x] = new Rgba32(imgSharp[x, y].R, imgSharp[x, y].G, imgSharp[x, y].B, imgSharp[x, y].A);
-		//	}
-		//}
-
-		Value_Contrast += 20;
-		double factor = (259 * (Value_Contrast + 255)) / (255 * (259 - Value_Contrast));
+		////2
+		double input_value = double.Parse(e.Value.ToString());
+		//Value_Contrast = val;
+		DictV["IncV"] = 1;
+		DictV["ContrastV"] = input_value;
 
 
+		////3 edit image
+		ApplyBaseImageAndIncrementalFiltersToCurrentImage();
 
-		for (int y = 0; y < imgSharp.Height; y++)
-		{
-			Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
-			for (int x = 0; x < imgSharp.Width; x++)
-			{
-				double red = (factor * (imgSharp[x, y].A - Value_Contrast) + Value_Contrast);
-				double green = (factor * (imgSharp[x, y].G - Value_Contrast) + Value_Contrast);
-				double blue = (factor * (imgSharp[x, y].B - Value_Contrast) + Value_Contrast);
+		//update slider "knob" and associated text value
+		JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Contrast", input_value);
+	}
+	void Onchange_Slider_Brightness(ChangeEventArgs e)
+	{
+		ClearRedo();                   //0.8
+		is_FilterIncremental = true;   //0.9
+		SaveAttributesToUndoLists();   //1-1.4
 
-				if (red > 255) { red = 255; }
-				else if (red < 0) { red = 0; }
-				if (green > 255) { green = 255; }
-				else if (green < 0) { green = 0; }
-				if (blue > 255) { blue = 255; }
-				else if (blue < 0) { blue = 0; }
+		////2
+		int input_value = int.Parse(e.Value.ToString());
+		//Value_Brightness = val;
+		DictV["IncV"] = 1;
+		DictV["BrightnessV"] = input_value;
 
-				byte red2 = (byte)red;
-				byte green2 = (byte)green;
-				byte blue2 = (byte)blue;
+		////3 edit image
+		ApplyBaseImageAndIncrementalFiltersToCurrentImage();
 
-				pixelRowSpan[x] = new Rgba32(red2, green2, blue2, imgSharp[x, y].A);
-			}
-		}
+		//update slider "knob" and associated text value
+		JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Brightness", input_value);
+	}
+	void Onchange_Slider_Red(ChangeEventArgs e)
+	{
+		ClearRedo();                   //0.8
+		is_FilterIncremental = true;   //0.9
+		SaveAttributesToUndoLists();   //1-1.4
+
+		////2
+		int input_value = int.Parse(e.Value.ToString());
+		//Value_Red = val;
+		DictV["IncV"] = 1;
+		DictV["RedV"] = input_value;
+
+		////3 edit image
+		ApplyBaseImageAndIncrementalFiltersToCurrentImage();
+
+		//////4 
+		//if (is_FilterIncremental == false)
+		//	Flatten();
+
+		////update slider "knob" and associated text value
+		JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Red", input_value);
 	}
 
-	public void ContrastDown()
+	void Onchange_Slider_Green(ChangeEventArgs e)
 	{
-		//imgSharp.Mutate(ctx => ctx.HistogramEqualization());
-		imgSharp.Mutate(ctx => ctx.Quantize());
-		//imgSharp.Mutate(ctx => ctx.Lomograph());
-		//imgSharp_original2 = imgSharp.Clone();
-		//OR
+		ClearRedo();                   //0.8
+		is_FilterIncremental = true;   //0.9
+		SaveAttributesToUndoLists();   //1-1.4
 
+		////2
+		int input_value = int.Parse(e.Value.ToString());
+		//Value_Green = val;
+		DictV["IncV"] = 1;
+		DictV["GreenV"] = input_value;
+
+		////3 edit image
+		ApplyBaseImageAndIncrementalFiltersToCurrentImage();
+
+		//////4 
+		//if (is_FilterIncremental == false)
+		//	Flatten();
+
+		////update slider "knob" and associated text value
+		JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Green", input_value);
+	}
+
+	void Onchange_Slider_Blue(ChangeEventArgs e)
+	{
+		ClearRedo();                   //0.8
+		is_FilterIncremental = true;   //0.9
+		SaveAttributesToUndoLists();   //1-1.4
+
+		////2
+		int input_value = int.Parse(e.Value.ToString());
+		//Value_Blue = val;
+		DictV["IncV"] = 1;
+		DictV["BlueV"] = input_value;
+
+		////3 edit image
+		ApplyBaseImageAndIncrementalFiltersToCurrentImage();
+
+		//////4 
+		//if (is_FilterIncremental == false)
+		//	Flatten();
+
+		////update slider "knob" and associated text value
+		JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Blue", input_value);
+	}
+
+	//incremental filters - END
+	//incremental filters
+	//incremental filters
+	//incremental filters
+
+
+
+	void Flatten() //looks good
+	{
+		ClearRedo();                   //0.8
+		is_FilterIncremental = true;   //0.9 //might be true to avoid playing flatten() in infinite loop
+		SaveAttributesToUndoLists();   //1-1.4
+
+		////2 reset all incremental filter attributes to 0
+		foreach (var a in DictV)
+		{
+			DictV[a.Key] = 0;
+		}
+
+		////2.5 (imgSharp_original2 = imgSharp)
 		for (int y = 0; y < imgSharp_original2.Height; y++)
 		{
-			Span<Rgba32> pixelRowSpan = imgSharp_original2.GetPixelRowSpan(y);
 			for (int x = 0; x < imgSharp_original2.Width; x++)
 			{
-				pixelRowSpan[x] = new Rgba32(imgSharp[x, y].R, imgSharp[x, y].G, imgSharp[x, y].B, imgSharp[x, y].A);
+				imgSharp_original2[x, y] = new Rgba32(imgSharp[x, y].R, imgSharp[x, y].G, imgSharp[x, y].B, imgSharp[x, y].A);
 			}
 		}
+
+
+		////3 no action needed (imgSharp = imgSharp_original2		
+
+		////way1 - call javascript function invokevoidasync, reset slider position and text value
+		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Contrast");
+		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Brightness");
+		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Red");
+		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Green");
+		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Blue");
+
+
+	}
+
+	void Flatten_nosavingtoundo() //looks good
+	{
+
+		////2 reset all incremental filter attributes to 0
+		foreach (var a in DictV)
+		{
+			DictV[a.Key] = 0;
+		}
+
+		////2.5 (imgSharp_original2 = imgSharp)
+		for (int y = 0; y < imgSharp_original2.Height; y++)
+		{
+			for (int x = 0; x < imgSharp_original2.Width; x++)
+			{
+				imgSharp_original2[x, y] = new Rgba32(imgSharp[x, y].R, imgSharp[x, y].G, imgSharp[x, y].B, imgSharp[x, y].A);
+			}
+		}
+
+
+		////3 no action needed (imgSharp = imgSharp_original2		
+
+		////way1 - call javascript function invokevoidasync, reset slider position and text value
+		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Contrast");
+		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Brightness");
+		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Red");
+		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Green");
+		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Blue");
+	}
+
+
+
+
+
+	void Filter1()
+	{
+
+
+		//
+
+
+	}
+
+	public void Filter2()
+	{
+
+
+
+		ClearRedo();                   //0.8
+		is_FilterIncremental = false;  //0.9
+		SaveAttributesToUndoLists();   //1-1.4
+
+		////2 (reset incremental filter attributes when user uses non-incremental filter)
+		foreach (var a in DictV)
+		{
+			DictV[a.Key] = 0;
+		}
+
+		////3
+		imgSharp.Mutate(ctx => ctx.HistogramEqualization());
+		//imgSharp.Mutate(ctx => ctx.Quantize());
+		//imgSharp.Mutate(ctx => ctx.Lomograph());
+		//imgSharp.Mutate(ctx => ctx.GaussianBlur(1));
+
+		////4 affix
+		Flatten_nosavingtoundo();
+
 	}
 
 
@@ -689,135 +817,6 @@
 	}
 
 
-	void Onchange_Slider_Brightness(ChangeEventArgs e)
-	{
-		ClearRedo();                   //0.8
-		is_FilterIncremental = true;   //0.9
-		SaveAttributesToUndoLists();   //1-1.4
-
-		////2
-		int val = int.Parse(e.Value.ToString());
-		//Value_Brightness = val;
-		DictV["IncV"] = 1;
-		DictV["BrightnessV"] = val;
-
-
-		////3 edit image
-		ApplyDictVtoBaseImage();
-
-		//update slider "knob" and associated text value
-		JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Brightness", val);
-	}
-	void Onchange_Slider_Red(ChangeEventArgs e)
-	{
-		ClearRedo();                   //0.8
-		is_FilterIncremental = true;   //0.9
-		SaveAttributesToUndoLists();   //1-1.4
-
-		////2
-		int val = int.Parse(e.Value.ToString());
-		//Value_Red = val;
-		DictV["IncV"] = 1;
-		DictV["RedV"] = val;
-
-		////3 edit image
-		ApplyDictVtoBaseImage();
-
-		////4 
-		if (is_FilterIncremental == false)
-			Flatten();
-
-		////update slider "knob" and associated text value
-		JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Red", val);
-	}
-
-	void Onchange_Slider_Green(ChangeEventArgs e)
-	{
-		ClearRedo();                   //0.8
-		is_FilterIncremental = true;   //0.9
-		SaveAttributesToUndoLists();   //1-1.4
-
-		////2
-		int val = int.Parse(e.Value.ToString());
-		//Value_Green = val;
-		DictV["IncV"] = 1;
-		DictV["GreenV"] = val;
-
-		////3 edit image
-		ApplyDictVtoBaseImage();
-
-		////4 
-		if (is_FilterIncremental == false)
-			Flatten();
-
-		////update slider "knob" and associated text value
-		JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Green", val);
-	}
-
-	void Onchange_Slider_Blue(ChangeEventArgs e)
-	{
-		ClearRedo();                   //0.8
-		is_FilterIncremental = true;   //0.9
-		SaveAttributesToUndoLists();   //1-1.4
-
-		////2
-		int val = int.Parse(e.Value.ToString());
-		//Value_Blue = val;
-		DictV["IncV"] = 1;
-		DictV["BlueV"] = val;
-
-		////3 edit image
-		ApplyDictVtoBaseImage();
-
-		////4 
-		if (is_FilterIncremental == false)
-			Flatten();
-
-		////update slider "knob" and associated text value
-		JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Blue", val);
-	}
-
-	//incremental filters
-	//incremental filters
-
-
-
-
-
-	void Flatten() //looks good
-	{
-		ClearRedo();                   //0.8
-		is_FilterIncremental = true;   //0.9 //might be true to avoid playing flatten() in infinite loop
-		SaveAttributesToUndoLists();   //1-1.4
-
-		////2 reset all incremental filter attributes to 0
-		foreach (KeyValuePair<string, int> a in DictV)
-		{
-			DictV[a.Key] = 0;
-		}
-
-		////2.5 (imgSharp_original2 = imgSharp)
-		for (int y = 0; y < imgSharp_original2.Height; y++)
-		{
-			for (int x = 0; x < imgSharp_original2.Width; x++)
-			{
-				imgSharp_original2[x, y] = new Rgba32(imgSharp[x, y].R, imgSharp[x, y].G, imgSharp[x, y].B, imgSharp[x, y].A);
-			}
-		}
-
-
-		////3 no action needed (imgSharp = imgSharp_original2		
-
-		////way1 - call javascript function invokevoidasync, reset slider position and text value
-		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Brightness");
-		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Red");
-		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Green");
-		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Blue");
-	}
-
-
-
-
 	public void GaussianBlur()
 	{
 		if (displayImage == true)
@@ -827,7 +826,7 @@
 			SaveAttributesToUndoLists();   //1-1.4
 
 			////2 (reset incremental filter attributes when user uses non-incremental filter)
-			foreach (KeyValuePair<string, int> a in DictV)
+			foreach (var a in DictV)
 			{
 				DictV[a.Key] = 0;
 			}
@@ -836,9 +835,11 @@
 			imgSharp.Mutate(ctx => ctx.GaussianBlur(1));
 
 			////4 affix
-			Flatten();
+			Flatten_nosavingtoundo();
 		}
 	}
+
+
 
 
 	//pixel manipulation way 1
@@ -854,12 +855,12 @@
 			SaveAttributesToUndoLists();   //1-1.4
 
 			//2 (reset incremental filter attributes when user uses non-incremental filter)
-			foreach (KeyValuePair<string, int> a in DictV)
+			foreach (var a in DictV)
 			{
 				DictV[a.Key] = 0;
 			}
 
-			//3 (none) dont use ApplyDictVtoBaseImage method?
+			//3 (none) dont use ApplyBaseImageAndIncrementalFiltersToCurrentImage method?
 			for (int w = 0; w < imgSharp.Width; w++)
 			{
 				for (int h = 0; h < imgSharp.Height; h++)
@@ -871,7 +872,7 @@
 			}
 
 			//4 affix
-			Flatten();
+			Flatten_nosavingtoundo();
 		}
 	}
 
@@ -883,6 +884,18 @@
 		if (displayImage == true)
 		{
 			showprocessing = true;
+			ClearRedo();                   //0.8
+			is_FilterIncremental = false;  //0.9
+			SaveAttributesToUndoLists();   //1-1.4
+
+			////2 (reset incremental filter attributes when user uses non-incremental filter)
+			foreach (var a in DictV)
+			{
+				DictV[a.Key] = 0;
+			}
+
+			////3 edit
+
 			int height = imgSharp.Height - 1;
 			int width = imgSharp.Width - 1; //preivious -1
 
@@ -1276,11 +1289,11 @@
 					pixelRowSpan[x] = new Rgba32(Gxy_sum_final_Red2, Gxy_sum_final_Green2, Gxy_sum_final_Blue2, val_Alpha2);
 				}
 			}
+			//4 affix
+			Flatten_nosavingtoundo();
+
+			showprocessing = false;
 		}
-
-
-
-		showprocessing = false;
 	}
 
 
@@ -1291,7 +1304,7 @@
 		SaveAttributesToUndoLists();   //1-1.4
 
 		////2 (reset incremental filter attributes when user uses non-incremental filter)
-		foreach (KeyValuePair<string, int> a in DictV)
+		foreach (var a in DictV)
 		{
 			DictV[a.Key] = 0;
 		}
@@ -1300,7 +1313,8 @@
 		imgSharp.Mutate(x => x.OilPaint());
 
 		////4 affix
-		Flatten();
+		Flatten_nosavingtoundo(); //no savetoundo
+
 
 	}
 
@@ -1311,6 +1325,53 @@
 	{
 		if (displayImage == true)
 		{
+			ClearRedo();                   //0.8
+			is_FilterIncremental = false;  //0.
+										   //SaveAttributesToUndoLists();   //1-1.4 //need to not use flatten in this reset
+
+			////1
+			////saving imgSharp_original2 to imgSharplist_undo list:
+			Image<Rgba32> imgSharp_temporary = new Image<Rgba32>(imgSharp.Width, imgSharp.Height);
+			for (int y = 0; y < imgSharp_temporary.Height; y++)
+			{
+				//Span<Rgba32> pixelRowSpan = imgSharp_temporary.GetPixelRowSpan(y);
+				for (int x = 0; x < imgSharp_temporary.Width; x++)
+				{
+					imgSharp_temporary[x, y] = new Rgba32(imgSharp_original2[x, y].R, imgSharp_original2[x, y].G, imgSharp_original2[x, y].B, imgSharp_original2[x, y].A);
+				}
+			}
+			imgSharplist_undo.Add(imgSharp_temporary);
+
+			////1.2
+			////saving incremental filter attributes to undo lists
+			IncV_undo.Add(DictV["IncV"]);
+			ContrastV_undo.Add(DictV["ContrastV"]);
+			BrightnessV_undo.Add(DictV["BrightnessV"]);
+			ContrastV_undo.Add(DictV["ContrastV"]);
+			OpacityV_undo.Add(DictV["OpacityV"]);
+			RedV_undo.Add(DictV["RedV"]);
+			GreenV_undo.Add(DictV["GreenV"]);
+			BlueV_undo.Add(DictV["BlueV"]);
+
+			////1.3 (limit undo lists' count to num_limit) (unique code block)
+			int num_limit = 3;
+			if (imgSharplist_undo.Count > num_limit) { imgSharplist_undo.RemoveAt(0); }
+			if (IncV_undo.Count > num_limit) { IncV_undo.RemoveAt(0); }
+			if (ContrastV_undo.Count > num_limit) { ContrastV_undo.RemoveAt(0); }
+			if (BrightnessV_undo.Count > num_limit) { BrightnessV_undo.RemoveAt(0); }
+			if (OpacityV_undo.Count > num_limit) { OpacityV_undo.RemoveAt(0); }
+			if (RedV_undo.Count > num_limit) { RedV_undo.RemoveAt(0); }
+			if (GreenV_undo.Count > num_limit) { GreenV_undo.RemoveAt(0); }
+			if (BlueV_undo.Count > num_limit) { BlueV_undo.RemoveAt(0); }
+
+
+			////2 (reset incremental filter attributes when user uses non-incremental filter)
+			foreach (var a in DictV)
+			{
+				DictV[a.Key] = 0;
+			}
+
+			////3
 			for (int y = 0; y < imgSharp.Height; y++)
 			{
 				Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
@@ -1321,19 +1382,87 @@
 					pixelRowSpan2[x] = new Rgba32(imgSharp_original1[x, y].R, imgSharp_original1[x, y].G, imgSharp_original1[x, y].B, imgSharp_original1[x, y].A);
 				}
 			}
-		}
 
-		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Brightness");
-		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Red");
-		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Green");
-		JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Blue");
+			//4 affix
+			Flatten_nosavingtoundo();
 
+			JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Contrast");
+			JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Brightness");
+			JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Red");
+			JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Green");
+			JS.InvokeVoidAsync("JS_resetsliderpositionandtextvalue_Blue");
 
-		foreach (var a in DictV)
-		{
-			DictV[a.Key] = 0;
+			//JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Contrast", DictV["ContrastV"]);
+			//JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Brightness", DictV["BrightnessV"]);
+			//JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Red", DictV["RedV"]);
+			//JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Green", DictV["GreenV"]);
+			//JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Blue", DictV["BlueV"]);
+			//foreach (var a in DictV)
+			//{
+			//	DictV[a.Key] = 0;
+			//}
 		}
 	}
+
+
+	void SaveAttributesToUndoLists() //1-1.4
+	{
+		////1
+		////saving imgSharp_original2 to imgSharplist_undo list:
+		Image<Rgba32> imgSharp_temporary = new Image<Rgba32>(imgSharp.Width, imgSharp.Height);
+		for (int y = 0; y < imgSharp_temporary.Height; y++)
+		{
+			//Span<Rgba32> pixelRowSpan = imgSharp_temporary.GetPixelRowSpan(y);
+			for (int x = 0; x < imgSharp_temporary.Width; x++)
+			{
+				imgSharp_temporary[x, y] = new Rgba32(imgSharp_original2[x, y].R, imgSharp_original2[x, y].G, imgSharp_original2[x, y].B, imgSharp_original2[x, y].A);
+			}
+		}
+		imgSharplist_undo.Add(imgSharp_temporary);
+
+		////1.2
+		////saving incremental filter attributes to undo lists
+		IncV_undo.Add(DictV["IncV"]);
+		ContrastV_undo.Add(DictV["ContrastV"]);
+		BrightnessV_undo.Add(DictV["BrightnessV"]);
+		OpacityV_undo.Add(DictV["OpacityV"]);
+		RedV_undo.Add(DictV["RedV"]);
+		GreenV_undo.Add(DictV["GreenV"]);
+		BlueV_undo.Add(DictV["BlueV"]);
+
+		////1.3 (limit undo lists' count to num_limit) (unique code block)
+		int num_limit = 3;
+		if (imgSharplist_undo.Count > num_limit) { imgSharplist_undo.RemoveAt(0); }
+		if (IncV_undo.Count > num_limit) { IncV_undo.RemoveAt(0); }
+		if (ContrastV_undo.Count > num_limit) { ContrastV_undo.RemoveAt(0); }
+		if (BrightnessV_undo.Count > num_limit) { BrightnessV_undo.RemoveAt(0); }
+		if (OpacityV_undo.Count > num_limit) { OpacityV_undo.RemoveAt(0); }
+		if (RedV_undo.Count > num_limit) { RedV_undo.RemoveAt(0); }
+		if (GreenV_undo.Count > num_limit) { GreenV_undo.RemoveAt(0); }
+		if (BlueV_undo.Count > num_limit) { BlueV_undo.RemoveAt(0); }
+
+		////1.4 (put this on undo/redo? no)
+		if (DictV["IncV"] == 1 && is_FilterIncremental == false)
+			Flatten();
+
+	}
+
+
+	void ClearRedo()
+	{
+		//List<Image<Rgba32>> imgSharplist_redo = new List<Image<Rgba32>>(); //not working
+		imgSharplist_redo = new List<Image<Rgba32>>();
+		List<int> IncV_redo = new List<int>();
+		List<int> ContrastV_redo = new List<int>();
+		List<int> BrightnessV_redo = new List<int>();
+		List<int> OpacityV_redo = new List<int>();
+		List<int> RedV_redo = new List<int>();
+		List<int> GreenV_redo = new List<int>();
+		List<int> BlueV_redo = new List<int>();
+	}
+
+
+
 
 
 
@@ -1341,7 +1470,7 @@
 	{
 		if (displayImage == true && imgSharplist_undo.Count >= 1)
 		{
-			////1
+			////1 imgsharp - storing to redo list
 			Image<Rgba32> imgSharp_temporary = new Image<Rgba32>(imgSharp.Width, imgSharp.Height);
 			for (int y = 0; y < imgSharp_temporary.Height; y++)
 			{
@@ -1353,17 +1482,18 @@
 			}
 			imgSharplist_redo.Add(imgSharp_temporary);
 
-			////1
+			////1.2 imgsharp's attributes - storing to redo lists
 			IncV_redo.Add(DictV["IncV"]);
-			BrightnessV_redo.Add(DictV["BrightnessV"]);
 			ContrastV_redo.Add(DictV["ContrastV"]);
+			BrightnessV_redo.Add(DictV["BrightnessV"]);
 			OpacityV_redo.Add(DictV["OpacityV"]);
 			RedV_redo.Add(DictV["RedV"]);
 			GreenV_redo.Add(DictV["GreenV"]);
 			BlueV_redo.Add(DictV["BlueV"]);
 
-			//2 
-			//imgsharp
+			////1.3, 1.4 none (no need trim undo/redo lists' count to 3, no need to flatten)
+
+			////2 imgsharp - pulling & deleting from undo list
 			for (int y = 0; y < imgSharp_original2.Height; y++)
 			{
 				Span<Rgba32> pixelRowSpan = imgSharp_original2.GetPixelRowSpan(y);
@@ -1373,27 +1503,29 @@
 					pixelRowSpan[x] = new Rgba32(undoimage[x, y].R, undoimage[x, y].G, undoimage[x, y].B, undoimage[x, y].A);
 				}
 			}
-			//imgsharp's attributes
+			imgSharplist_undo.RemoveAt(imgSharplist_undo.Count - 1);
+
+			////2 imgsharp's attributes - pulling & deleting from undo lists
 			DictV["IncV"] = IncV_undo.ElementAt(IncV_undo.Count - 1);
-			DictV["BrightnessV"] = BrightnessV_undo.ElementAt(BrightnessV_undo.Count - 1);
 			DictV["ContrastV"] = ContrastV_undo.ElementAt(ContrastV_undo.Count - 1);
+			DictV["BrightnessV"] = BrightnessV_undo.ElementAt(BrightnessV_undo.Count - 1);
 			DictV["OpacityV"] = OpacityV_undo.ElementAt(OpacityV_undo.Count - 1);
 			DictV["RedV"] = RedV_undo.ElementAt(RedV_undo.Count - 1);
 			DictV["GreenV"] = GreenV_undo.ElementAt(GreenV_undo.Count - 1);
 			DictV["BlueV"] = BlueV_undo.ElementAt(BlueV_undo.Count - 1);
-
-			imgSharplist_undo.RemoveAt(imgSharplist_undo.Count - 1);
 			IncV_undo.RemoveAt(IncV_undo.Count - 1);
-			BrightnessV_undo.RemoveAt(BrightnessV_undo.Count - 1);
 			ContrastV_undo.RemoveAt(ContrastV_undo.Count - 1);
+			BrightnessV_undo.RemoveAt(BrightnessV_undo.Count - 1);
 			OpacityV_undo.RemoveAt(OpacityV_undo.Count - 1);
 			RedV_undo.RemoveAt(RedV_undo.Count - 1);
 			GreenV_undo.RemoveAt(GreenV_undo.Count - 1);
 			BlueV_undo.RemoveAt(BlueV_undo.Count - 1);
 
-			//3 update imgsharp
-			ApplyDictVtoBaseImage();
+			////3 - apply imgSharp_original2 & new attributes to imgSharp 
+			ApplyBaseImageAndIncrementalFiltersToCurrentImage();
 
+			////
+			JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Contrast", DictV["ContrastV"]);
 			JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Brightness", DictV["BrightnessV"]);
 			JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Red", DictV["RedV"]);
 			JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Green", DictV["GreenV"]);
@@ -1417,16 +1549,19 @@
 				}
 			}
 			imgSharplist_undo.Add(imgSharp_temporary);
+
 			////1.2
 			IncV_undo.Add(DictV["IncV"]);
-			BrightnessV_undo.Add(DictV["BrightnessV"]);
 			ContrastV_undo.Add(DictV["ContrastV"]);
+			BrightnessV_undo.Add(DictV["BrightnessV"]);
 			OpacityV_undo.Add(DictV["OpacityV"]);
 			RedV_undo.Add(DictV["RedV"]);
 			GreenV_undo.Add(DictV["GreenV"]);
 			BlueV_undo.Add(DictV["BlueV"]);
 
-			////2 imgsharp
+			////1.3, 1.4 none (no need trim undo/redo lists' count to 3, no need to flatten)
+
+			////2 imgsharp - pulling & deleting from redo list
 			for (int y = 0; y < imgSharp_original2.Height; y++)
 			{
 				Span<Rgba32> pixelRowSpan = imgSharp_original2.GetPixelRowSpan(y);
@@ -1436,26 +1571,29 @@
 					pixelRowSpan[x] = new Rgba32(redoimage[x, y].R, redoimage[x, y].G, redoimage[x, y].B, redoimage[x, y].A);
 				}
 			}
+			imgSharplist_redo.RemoveAt(imgSharplist_redo.Count - 1);
+
+			////2 imgsharp's attributes - pulling & deleting from redo lists
 			DictV["IncV"] = IncV_redo.ElementAt(IncV_redo.Count - 1);
-			DictV["BrightnessV"] = BrightnessV_redo.ElementAt(BrightnessV_redo.Count - 1);
 			DictV["ContrastV"] = ContrastV_redo.ElementAt(ContrastV_redo.Count - 1);
+			DictV["BrightnessV"] = BrightnessV_redo.ElementAt(BrightnessV_redo.Count - 1);
 			DictV["OpacityV"] = OpacityV_redo.ElementAt(OpacityV_redo.Count - 1);
 			DictV["RedV"] = RedV_redo.ElementAt(RedV_redo.Count - 1);
 			DictV["GreenV"] = GreenV_redo.ElementAt(GreenV_redo.Count - 1);
 			DictV["BlueV"] = BlueV_redo.ElementAt(BlueV_redo.Count - 1);
-
-			imgSharplist_redo.RemoveAt(imgSharplist_redo.Count - 1);
 			IncV_redo.RemoveAt(IncV_redo.Count - 1);
-			BrightnessV_redo.RemoveAt(BrightnessV_redo.Count - 1);
 			ContrastV_redo.RemoveAt(ContrastV_redo.Count - 1);
+			BrightnessV_redo.RemoveAt(BrightnessV_redo.Count - 1);
 			OpacityV_redo.RemoveAt(OpacityV_redo.Count - 1);
 			RedV_redo.RemoveAt(RedV_redo.Count - 1);
 			GreenV_redo.RemoveAt(GreenV_redo.Count - 1);
 			BlueV_redo.RemoveAt(BlueV_redo.Count - 1);
 
-			////3
-			ApplyDictVtoBaseImage();
+			////3 - apply imgSharp_original2 & new attributes to imgSharp 
+			ApplyBaseImageAndIncrementalFiltersToCurrentImage();
 
+			////
+			JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Contrast", DictV["ContrastV"]);
 			JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Brightness", DictV["BrightnessV"]);
 			JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Red", DictV["RedV"]);
 			JS.InvokeVoidAsync("JS_changesliderpositionandtextvalue_Green", DictV["GreenV"]);
@@ -1475,8 +1613,6 @@
 
 	string Message = "No file(s) selected";
 	IReadOnlyList<IBrowserFile> selectedFiles;
-
-
 	private List<IBrowserFile> loadedFiles = new();
 	private long maxFileSize = 1024 * 15;
 	private int maxAllowedFiles = 1;
@@ -1484,7 +1620,6 @@
 	//if (imageFile.Type == "image/jpeg" || imageFile.Type == "image/png" || imageFile.Type == "image/jpg" || imageFile.Type == "image/jiff" || imageFile.Type == "image/bmp")
 	async Task UploadFile(InputFileChangeEventArgs e)
 	{
-
 		displayImage = false;
 		showerror = false;
 		showloading = true;
@@ -1494,12 +1629,10 @@
 		//string imageType = imageFile.ContentType;
 		//Debug.WriteLine($"data:{imageType};base64,{Convert.ToBase64String(buffers)}");
 
-
 		//await using FileStream fs = new(e, System.IO.FileMode.Create);
 		//await browserFile.OpenReadStream().CopyToAsync(fs);
 		//Debug.WriteLine(imageFile.ContentType);
 		//Debug.WriteLine(imageFile.Name);
-
 
 
 		if (imageFile != null) // blazorinputfile
@@ -1524,8 +1657,6 @@
 			//await imageFile.OpenReadStream(maxAllowedSize).CopyToAsync(ms);
 
 			////way4
-			//MemoryStream ms = new MemoryStream();
-			//await imageFile.OpenReadStream(maxAllowedSize).CopyToAsync(ms);
 			await using MemoryStream ms = new MemoryStream();
 			await imageFile.OpenReadStream(maxAllowedSize).CopyToAsync(ms);
 
@@ -1534,7 +1665,6 @@
 			//await using MemoryStream ms = new MemoryStream();
 
 			//await imageFile.OpenReadStream(maxAllowedSize).CopyToAsync(ms);
-
 
 			//pngEncoder.ColorType = SixLabors.ImageSharp.Formats.Png.PngColorType.Rgb;
 			//imgSharp.SaveAsPng(ms, pngEncoder);
@@ -1552,8 +1682,8 @@
 				//imgSharp = Image.Load<Rgba32>(buffers, out IIF1); // imagesharp
 				//imgSharp_original1 = Image.Load<Rgba32>(buffers, out IIF1);
 				//imgSharp_original2 = Image.Load<Rgba32>(buffers, out IIF1);
-				////way 4
 
+				////way 4
 				imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
 				imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
 				imgSharp_original2 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
@@ -1562,14 +1692,9 @@
 
 				status = $"Finished loading {imageFile.Size} bytes from {imageFile.Name}";
 
-
 				showloading = false;
 				displayImage = true;
 				showerror = false;
-
-
-				//Debug.WriteLine(IIF1);
-				//Debug.WriteLine(_ip.getBase64String_function());
 
 				//SixLabors.ImageSharp.Formats.Png.PngFormat works with transparency
 				//SixLabors.ImageSharp.Formats.Jpeg.JpegFormat does not
@@ -1593,89 +1718,5 @@
 
 
 	}
-
-
-	////// replace this file upload BEG
-	////// replace this file upload
-	////// replace this file upload
-
-	//use blazorinputfile extension nuget
-	////take in file input and create imagesharp
-	////async Task HandleFileSelected_function(IFileListEntry[] files) // blazorinputfile
-	//{
-
-	//    displayImage = false;
-	//    showerror = false;
-	//    showloading = true;
-
-	//    var imageFile = files.FirstOrDefault(); // blazorinputfile, firstordefault = default returns null
-	//                                            //var imageFile = files.First(); // blazorinputfile
-
-	//    if (imageFile.Type == "image/jpeg" || imageFile.Type == "image/png" || imageFile.Type == "image/jpg" || imageFile.Type == "image/jiff" || imageFile.Type == "image/bmp")
-	//    {
-	//        if (imageFile != null) // blazorinputfile
-	//        {
-	//            var ms = new MemoryStream(); // blazorinputfile
-	//            await imageFile.Data.CopyToAsync(ms); // blazorinputfile
-
-	//            ///ADDED
-	//            try
-	//            {
-	//                IImageFormat IIF1; // imagesharp
-	//                imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
-	//                imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
-
-	//                _ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
-
-
-	//                status = $"Finished loading {imageFile.Size} bytes from {imageFile.Name}";
-	//                showloading = false;
-	//                displayImage = true;
-	//                showerror = false;
-
-
-	//                //Debug.WriteLine(IIF1);
-
-	//                //SixLabors.ImageSharp.Formats.Png.PngFormat works with transparency
-	//                //SixLabors.ImageSharp.Formats.Jpeg.JpegFormat does not
-	//            }
-
-
-	//            catch (Exception e)
-	//            //catch (System.ArgumentException e)
-	//            {
-	//                Error = $"Error occured while loading image. {e.Message}(1)";
-	//                showerror = true;
-	//                showloading = false;
-
-	//                imageFile = files.FirstOrDefault();
-
-	//            }
-
-	//        }
-	//        else
-	//        {
-	//            Error = $"Unknown error occurred. Try refreshing. (2)";
-	//            showerror = true;
-	//            showloading = false;
-	//        }
-	//    }
-
-
-	//    else
-	//    {
-	//        Error = $"Error: File is not JPEG/JPG/PNG/JIFF/BMP image. (3)";
-	//        showerror = true;
-	//        showloading = false;
-	//    }
-
-
-	//}
-
-	////// replace this file upload END
-	////// replace this file upload
-	////// replace this file upload
-	//////
-
 
 }
