@@ -80,7 +80,6 @@
 @using Microsoft.AspNetCore.Hosting;
 @using Microsoft.AspNetCore.Components.Forms;
 @using Microsoft.Extensions.Logging
-@using System.Drawing.Imaging;
 @*@inject IWebHostEnvironment Environment*@ @*not needed?*@
 @inject IJSRuntime JS
 
@@ -105,51 +104,57 @@
 
 	string status = "Sample image";
 	string Error;
+	bool displayImage = false;
 	bool showloading = false;
 	bool showprocessing = false;
 	bool showerror = false;
-	bool displayImage = false;
-
 
 	Image<Rgba32> imgSharp;
 	Image<Rgba32> imgSharp_original1; //used by reset
-	Image<Rgba32> imgSharp_original2; //used by darken/brighten
+	Image<Rgba32> imgSharp_original2; //used by incremental filters
 
 	Dictionary<string, double> DictV = new Dictionary<string, double>();
 
+	//undo lists
 	List<Image<Rgba32>> imgSharplist_undo = new List<Image<Rgba32>>();
-	List<Image<Rgba32>> imgSharplist_redo = new List<Image<Rgba32>>();
-
 	List<double> IncV_undo = new List<double>(); //0 = false, 1 = true
-	List<double> IncV_redo = new List<double>();
 	List<double> ContrastV_undo = new List<double>();
-	List<double> ContrastV_redo = new List<double>();
 	List<double> BrightnessV_undo = new List<double>();
-	List<double> BrightnessV_redo = new List<double>();
 	List<double> OpacityV_undo = new List<double>();
-	List<double> OpacityV_redo = new List<double>();
 	List<double> RedV_undo = new List<double>();
-	List<double> RedV_redo = new List<double>();
 	List<double> GreenV_undo = new List<double>();
-	List<double> GreenV_redo = new List<double>();
 	List<double> BlueV_undo = new List<double>();
+
+
+	//redo lists
+	List<Image<Rgba32>> imgSharplist_redo = new List<Image<Rgba32>>();
+	List<double> IncV_redo = new List<double>();
+	List<double> ContrastV_redo = new List<double>();
+	List<double> BrightnessV_redo = new List<double>();
+	List<double> OpacityV_redo = new List<double>();
+	List<double> RedV_redo = new List<double>();
+	List<double> GreenV_redo = new List<double>();
 	List<double> BlueV_redo = new List<double>();
 
 	bool is_FilterIncremental = false;
 
-	ImageProcessing_CS _ip;
+	ImageProcessing_CS _ip; //not needed?
 
 	//need to make every uploaded images act as PNG //PROBLEM2
 	IImageFormat IIF1;
 	//IImageFormat format = image.CurrentImageFormat
 	//IImageFormat IIF2 = SixLabors.ImageSharp.Formats.Png.PngFormat;
+	IImageFormat IIF2;
 
-
+	////log
 	string infolog1;
 	string infolog2;
+	//string imagetype;
 	double brushsize = 0;
 	int imgSharpvHeight =0;
 	int imgSharpvWidth =0;
+
+
 	//METHOD TO be called first
 	//METHOD TO be called first
 
@@ -157,12 +162,29 @@
 	{
 		// Do Some Work
 		// Make website show uploaded/sample image upon loading
-		imgSharp = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1); // imagesharp
-		imgSharp_original1 = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
-		imgSharp_original2 = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
-		imgSharpvHeight = imgSharp.Height; imgSharpvWidth = imgSharp.Width;
+		//var pngEncoder = new SixLabors.ImageSharp.Formats.Png.PngEncoder();
+
+		////way1
+		using (var imgSharp = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg")) // imagesharp
+		{
+			imgSharp.Save("wwwroot/images/download.png");
+		}
+
+		imgSharp = Image.Load<Rgba32>("wwwroot/images/download.png", out IIF1);
+		imgSharp_original1 = Image.Load<Rgba32>("wwwroot/images/download.png", out IIF1);
+		imgSharp_original2 = Image.Load<Rgba32>("wwwroot/images/download.png", out IIF1);
+
+		////way2
+		//imgSharp = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
+		//imgSharp_original1 = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
+		//imgSharp_original2 = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
+
+		//imgSharpvHeight = imgSharp.Height; imgSharpvWidth = imgSharp.Width;
+
+
 
 		_ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
+
 		displayImage = true;
 
 		DictV.Add("IncV", 0); //0 = false, 1 = true
@@ -194,6 +216,7 @@
 
 	Height: @imgSharpvHeight<br />
 	Width: @imgSharpvWidth<br />
+	@*Image Type: @imagetype<br />*@
 	Brushsize for OilPaint: @brushsize<br />
 
 </div>
@@ -202,7 +225,7 @@
 	<figcaption>
 		Upload an image (15 MB max):
 	</figcaption>
-	<InputFile id="Upload an image" OnChange="@UploadFile" />
+	<InputFile id="InputFileID" OnChange="@UploadFile" />
 
 	@*<p>Upload an image (OLD): <InputFile OnChange="HandleFileSelected_function" /></p>*@
 	@*only available in Net 5.0, so use net 5.0 and ensure that ur fully migrated to net 5.0~!!!!*@
@@ -231,10 +254,10 @@
 	@*filters to fix*@
 	<button class="btn btn-primary" @onclick="Filter1">Filter1</button>
 	<button class="btn btn-primary" @onclick="Filter2">Filter2</button>
-	@*<button class="btn btn-primary" @onclick="OpacityUP">Opacity (+)</button>
+	<button class="btn btn-primary" @onclick="OpacityUP">Opacity (+)</button>
 		<button class="btn btn-primary" @onclick="OpacityDOWN">Opacity (-)</button>
 		Note: Opacity adjustment only works on PNG, not JPG/JPEG, for now.
-		<br />*@
+		<br />
 
 
 	<button class="btn btn-primary" @onclick="(() => Edge(0))">Line A</button>
@@ -297,8 +320,8 @@
 {
 	<p>
 		<div>
-			@*<img class="image_display"
-				 src="@_ip.getBase64String_function()" />*@
+			<img class="image_display"
+				 src="@_ip.getBase64String_function()" />
 			<img class="image_display"
 				 src="@imgSharp.ToBase64String(IIF1)" />
 		</div>
@@ -863,7 +886,7 @@
 	//pixel manipulation way 1
 	//(storing variable)
 	//grayscale filter
-	async void Grayscale()
+	void Grayscale()
 	{
 		if (displayImage == true)
 		{
@@ -925,7 +948,7 @@
 			//prewitt
 			if (parameter1 == 10)
 			{
-			OilPaint();
+				OilPaint();
 			}
 
 
@@ -982,7 +1005,6 @@
 			int Gxy_sum_final_Red = 0;
 
 			//int logprint_sum1 = 0;
-
 
 
 			for (int y = 0; y <= height; y++)
@@ -1106,24 +1128,24 @@
 
 
 					//////custom color background
-					int cutoff = 15; //should try make a slider ouit of this //IDEA1 //make alpha=0 background //30, 45, 60, 75
-					if (parameter1 == 1) { cutoff = 60; } //30, 45, 60, 75// previously 60
-					if (Gxy_sum_final_Blue <= cutoff && Gxy_sum_final_Green <= cutoff && Gxy_sum_final_Red <= cutoff)
-					{
+					//int cutoff = 15; //should try make a slider ouit of this //IDEA1 //make alpha=0 background //30, 45, 60, 75
+					//if (parameter1 == 1) { cutoff = 60; } //30, 45, 60, 75// previously 60
+					//if (Gxy_sum_final_Blue <= cutoff && Gxy_sum_final_Green <= cutoff && Gxy_sum_final_Red <= cutoff)
+					//{
 
-						Gxy_sum_final_Blue = 0;
-						Gxy_sum_final_Green = 0;
-						Gxy_sum_final_Red = 0;
-					}
-					else
-					{
-						//if (Gxy_sum_final_Blue < cutoff) { Gxy_sum_final_Blue = cutoff; }
-						//if (Gxy_sum_final_Green < cutoff) { Gxy_sum_final_Green = cutoff; }
-						//if (Gxy_sum_final_Red < cutoff) { Gxy_sum_final_Red = cutoff; }
-						//Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * 1.33);
-						//Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * 1.33);
-						//Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * 1.33);
-					}
+					//	Gxy_sum_final_Blue = 0;
+					//	Gxy_sum_final_Green = 0;
+					//	Gxy_sum_final_Red = 0;
+					//}
+					//else
+					//{
+					//	//if (Gxy_sum_final_Blue < cutoff) { Gxy_sum_final_Blue = cutoff; }
+					//	//if (Gxy_sum_final_Green < cutoff) { Gxy_sum_final_Green = cutoff; }
+					//	//if (Gxy_sum_final_Red < cutoff) { Gxy_sum_final_Red = cutoff; }
+					//	//Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * 1.33);
+					//	//Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * 1.33);
+					//	//Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * 1.33);
+					//}
 					//OR..
 					//////..transparant (before invert)
 					//int cutoff = 128; //should try make a slider ouit of this //IDEA1 //make alpha=0 background //180 FOR TRANSPARRENCY
@@ -1161,22 +1183,31 @@
 
 
 					//////////..transparant (after invert)
-					//int cutoff = 128; //should try make a slider ouit of this //IDEA1 //make alpha=0 background //180 FOR TRANSPARRENCY
-					//if (Gxy_sum_final_Blue >= cutoff && Gxy_sum_final_Blue >= cutoff && Gxy_sum_final_Blue >= cutoff)
-					//{
-					//    val_Alpha = 0;
-					//}
-					//else
-					//{
-					//    Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * 0.90); //should make sliders out of these //IDEA2 ex: 100% = 1, 200% = 2
-					//    Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * 0.90);
-					//    Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * 0.90);
-					//    //if (Gxy_sum_final_Blue > cutoff) { Gxy_sum_final_Blue = cutoff; }
-					//    //if (Gxy_sum_final_Green > cutoff) { Gxy_sum_final_Green = cutoff; }
-					//    //if (Gxy_sum_final_Red > cutoff) { Gxy_sum_final_Red = cutoff; }
-					//}
+					int cutoff = 225; //should try make a slider ouit of this //IDEA1 //make alpha=0 background //180 FOR TRANSPARRENCY
+					if (Gxy_sum_final_Blue >= cutoff && Gxy_sum_final_Blue >= cutoff && Gxy_sum_final_Blue >= cutoff)
+					{
+						val_Alpha = 0;
 
 
+					}
+					else
+					{
+						//Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue); //should make sliders out of these //IDEA2 ex: 100% = 1, 200% = 2
+						//Gxy_sum_final_Green = (int)(Gxy_sum_final_Green);
+						//Gxy_sum_final_Red = (int)(Gxy_sum_final_Red);
+						//if (Gxy_sum_final_Blue > cutoff) { Gxy_sum_final_Blue = cutoff; }
+						//if (Gxy_sum_final_Green > cutoff) { Gxy_sum_final_Green = cutoff; }
+						//if (Gxy_sum_final_Red > cutoff) { Gxy_sum_final_Red = cutoff; }
+					}
+					if (Gxy_sum_final_Blue < cutoff-25) { Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * 0.9); }
+					if (Gxy_sum_final_Green < cutoff-25) { Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * 0.9); }
+					if (Gxy_sum_final_Red < cutoff-25) { Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * 0.9); }
+					if (Gxy_sum_final_Blue < 128) { Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * 0.7); }
+					if (Gxy_sum_final_Green < 128) { Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * 0.7); }
+					if (Gxy_sum_final_Red < 128) { Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * 0.7); }
+					if (Gxy_sum_final_Blue < 64) { Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * 0.5); }
+					if (Gxy_sum_final_Green < 64) { Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * 0.5); }
+					if (Gxy_sum_final_Red < 64) { Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * 0.5); }
 
 
 					//No BW and/or shade way 0
@@ -1636,12 +1667,12 @@
 	//}
 
 
-	string Message = "No file(s) selected";
-	IReadOnlyList<IBrowserFile> selectedFiles;
-	private List<IBrowserFile> loadedFiles = new();
-	private long maxFileSize = 1024 * 15;
-	private int maxAllowedFiles = 1;
-	private bool isLoading;
+	//string Message = "No file(s) selected";
+	//IReadOnlyList<IBrowserFile> selectedFiles;
+	//private List<IBrowserFile> loadedFiles = new();
+	//private long maxFileSize = 1024 * 15;
+	//private int maxAllowedFiles = 1;
+	//private bool isLoading;
 	//if (imageFile.Type == "image/jpeg" || imageFile.Type == "image/png" || imageFile.Type == "image/jpg" || imageFile.Type == "image/jiff" || imageFile.Type == "image/bmp")
 	async Task UploadFile(InputFileChangeEventArgs e)
 	{
@@ -1651,7 +1682,9 @@
 
 		IBrowserFile imageFile = e.File;
 
-		//string imageType = imageFile.ContentType;
+		//call javascript function to get file name from inputfile id
+
+
 		//Debug.WriteLine($"data:{imageType};base64,{Convert.ToBase64String(buffers)}");
 
 		//await using FileStream fs = new(e, System.IO.FileMode.Create);
@@ -1682,22 +1715,20 @@
 			//await imageFile.OpenReadStream(maxAllowedSize).CopyToAsync(ms);
 
 			////way4
+			//await using MemoryStream ms = new MemoryStream();
+			//await imageFile.OpenReadStream(maxAllowedSize).CopyToAsync(ms);
+
+			////way4.1
 			await using MemoryStream ms = new MemoryStream();
 			await imageFile.OpenReadStream(maxAllowedSize).CopyToAsync(ms);
 
-			////way4.1
-			//imgSharp.SaveAsPng(e.File.ToString());
-			//await using MemoryStream ms = new MemoryStream();
-
-			//await imageFile.OpenReadStream(maxAllowedSize).CopyToAsync(ms);
-
-			//pngEncoder.ColorType = SixLabors.ImageSharp.Formats.Png.PngColorType.Rgb;
-			//imgSharp.SaveAsPng(ms, pngEncoder);
-
-			//await imageFile.OpenReadStream(maxAllowedSize).CopyToAsync(ms);
 			//var pngEncoder = new SixLabors.ImageSharp.Formats.Png.PngEncoder();
-			//imageFile.Save(ms, pngEncoder);
-			//img.Save(Path.ChangeExtension(path, ".jpg"))
+			//imgSharp.Save(ms, pngEncoder);
+
+
+			//await JS.InvokeVoidAsync("JS_getfilenamefrominputfile");
+			//string imageType;
+
 
 			try
 			{
@@ -1712,7 +1743,22 @@
 				imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
 				imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
 				imgSharp_original2 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
-				imgSharpvHeight = imgSharp.Height; imgSharpvWidth = imgSharp.Width;
+
+				////way4.1
+				using (var imgSharp = Image.Load<Rgba32>((ms.ToArray()))) // imagesharp
+				{
+					imgSharp.Save("wwwroot/images/download.png");
+				}
+
+				imgSharp = Image.Load<Rgba32>("wwwroot/images/download.png", out IIF1);
+				imgSharp_original1 = Image.Load<Rgba32>("wwwroot/images/download.png", out IIF1);
+				imgSharp_original2 = Image.Load<Rgba32>("wwwroot/images/download.png", out IIF1);
+
+
+				//imgSharpvHeight = imgSharp.Height; imgSharpvWidth = imgSharp.Width;
+
+
+
 
 				_ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
 
@@ -1726,7 +1772,7 @@
 				//SixLabors.ImageSharp.Formats.Jpeg.JpegFormat does not
 			}
 
-			catch (Exception x)
+			catch (Exception)
 			//catch (System.ArgumentException e)
 			{
 				Error = $"File is not an image (BMP/GIF/JPG/JPEG/PNG/TGA). Try again.";

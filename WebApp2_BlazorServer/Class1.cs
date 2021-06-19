@@ -7,5 +7,6 @@ namespace WebApp2_BlazorServer
 {
 	public class Class1
 	{
+
 	}
 }
