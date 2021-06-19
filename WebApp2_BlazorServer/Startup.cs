@@ -7,11 +7,10 @@ using WebApp2_BlazorServer.Data;
 using System;
 using System.Linq;
 
-//////signalr
-using Microsoft.AspNetCore.ResponseCompression;
-/////hubs
-using BlazorServerSignalRApp.Server.Hubs;
-using MoveShape.Hubs;
+
+using Microsoft.AspNetCore.ResponseCompression; //////signalr
+using BlazorServerSignalRApp.Server.Hubs; /////hubs
+//using MoveShape.Hubs; /////hubs
 
 
 
@@ -31,7 +30,6 @@ namespace WebApp2_BlazorServer {
             services.AddSingleton<WeatherForecastService>();
 
             //////signalr
-            ///
             services.AddSignalR();
             services.AddResponseCompression(opts =>
             {
@@ -43,9 +41,7 @@ namespace WebApp2_BlazorServer {
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
-
             app.UseResponseCompression(); //////signalr
-
 
 
             if (env.IsDevelopment()) {
@@ -62,11 +58,13 @@ namespace WebApp2_BlazorServer {
 
             app.UseRouting();
 
+
+
             app.UseFileServer(); //from moveshape sample program
             app.UseEndpoints(endpoints => {
                 endpoints.MapBlazorHub();
                 endpoints.MapHub<Hub1>("/Hub1"); //////signalr
-                endpoints.MapHub<ShapeHub>("/shapeHub");
+                //endpoints.MapHub<ShapeHub>("/shapeHub");
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

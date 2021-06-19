@@ -1,6 +1,6 @@
-﻿<h3>Signalr2</h3>
+﻿
 @page "/Signalr2"
-
+<!--
 @using BlazorServerApp1; @*project name*@
 @using SixLabors.ImageSharp;
 @using SixLabors.ImageSharp.Formats;
@@ -17,9 +17,11 @@
 
 @using System.Threading.Tasks;
 @using Microsoft.AspNetCore.SignalR;
+-->
 
 
-
+<!--
+<h3>Signalr2</h3>
 <h1>Image Editor</h1>
 
 
@@ -32,11 +34,11 @@
 	<InputFile id="Upload an image" OnChange="@UploadFile_original" />
 </form>
 
-<button @onclick="(() => Edge_signalr0(1))">Edge (Signalr)</button>
+<button @onclick="(() => Edge_signalr0(1))">Edge (Signalr)</button>-->
 @*<InputFile OnChange="(() => buttonfunction1(2))">button1 (inputfile)</InputFile>*@
 @*<InputFile OnChange="UploadFile">button1 (inputfile)</InputFile>*@
 
-<div>
+<!--<div>
 	@if (showloading == true)
 	{
 		<p style="color:greenyellow">Uploading...</p>}
@@ -68,138 +70,602 @@
 @foreach (var message in messages)
 {
 	<li>@message</li>
-}
+}-->
 
+
+<!--
 
 @code {
-	Dictionary<string, int> DictV = new Dictionary<string, int>();
+		Dictionary<string, int> DictV = new Dictionary<string, int>();
 
-	void SomeStartupMethod()
-	{
-		// Do Some Work
-		// Make website show uploaded/sample image upon loading
-		imgSharp = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1); // imagesharp
-		imgSharp_original1 = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
-		imgSharp_original2 = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
-
-		_ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
-		displayImage = true;
-
-		DictV.Add("BrightnessV", 0);
-		DictV.Add("RedV", 0);
-		DictV.Add("GreenV", 0);
-		DictV.Add("BlueV", 0);
-	}
-
-
-	private HubConnection hubConnection;
-
-
-	//chathub
-	//chathub
-	private List<string> messages = new List<string>();
-	private string userInput;
-	private string messageInput;
-
-	//image editor
-	//image editor
-	string status = "Sample image";
-	string Error = "Error!";
-	bool showloading = false;
-	bool showprocessing = false;
-	bool showerror = false;
-	bool displayImage = false;
-	Image<Rgba32> imgSharp;
-	Image<Rgba32> imgSharp_original1;
-	Image<Rgba32> imgSharp_original2;
-	ImageProcessing_CS _ip;
-	IImageFormat IIF1;
-	InputFileChangeEventArgs e1;
-
-
-	string Message = "No file(s) selected";
-	IReadOnlyList<IBrowserFile> selectedFiles;
-	private List<IBrowserFile> loadedFiles = new();
-	private long maxFileSize = 1024 * 15;
-	private int maxAllowedFiles = 1;
-	private bool isLoading;
-	//image editor
-	//image editor
-
-
-
-	protected override async Task OnInitializedAsync()
-	{
-		SomeStartupMethod();
-
-		hubConnection = new HubConnectionBuilder()
-			.WithUrl(NavigationManager.ToAbsoluteUri("/Hub1"))
-			.Build();
-
-		//CHATHUB_STEP4
-		hubConnection.On<string, string>("ReceiveMessage2", (user, message) =>
+		void SomeStartupMethod()
 		{
-			string encodedMsg = $"{user}: {message}";
-			messages.Add(encodedMsg);
-			StateHasChanged();
-		});
+			// Do Some Work
+			// Make website show uploaded/sample image upon loading
+			imgSharp = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1); // imagesharp
+			imgSharp_original1 = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
+			imgSharp_original2 = Image.Load<Rgba32>("wwwroot/images/wlop1.jpg", out IIF1);
+
+			_ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
+			displayImage = true;
+
+			DictV.Add("BrightnessV", 0);
+			DictV.Add("RedV", 0);
+			DictV.Add("GreenV", 0);
+			DictV.Add("BlueV", 0);
+		}
 
 
-		//_hub.On<Message>("SendMessageToClient", async i => await OnMessageFromServer(i.Id, i.Message))
+		private HubConnection hubConnection;
 
-		//EDGE_STEP4
-		hubConnection.On<int>("Edge_signalr2", (parameter1) =>
+
+		//chathub
+		//chathub
+		private List<string> messages = new List<string>();
+		private string userInput;
+		private string messageInput;
+
+		//image editor
+		//image editor
+		string status = "Sample image";
+		string Error = "Error!";
+		bool showloading = false;
+		bool showprocessing = false;
+		bool showerror = false;
+		bool displayImage = false;
+		Image<Rgba32> imgSharp;
+		Image<Rgba32> imgSharp_original1;
+		Image<Rgba32> imgSharp_original2;
+		ImageProcessing_CS _ip;
+		IImageFormat IIF1;
+		InputFileChangeEventArgs e1;
+
+
+		string Message = "No file(s) selected";
+		IReadOnlyList<IBrowserFile> selectedFiles;
+		private List<IBrowserFile> loadedFiles = new();
+		private long maxFileSize = 1024 * 15;
+		private int maxAllowedFiles = 1;
+		private bool isLoading;
+		//image editor
+		//image editor
+
+
+
+		protected override async Task OnInitializedAsync()
 		{
-			string encodedMsg = $"{parameter1}";
-			messages.Add(encodedMsg);
-			showerror = true;
+			SomeStartupMethod();
+
+			hubConnection = new HubConnectionBuilder()
+				.WithUrl(NavigationManager.ToAbsoluteUri("/Hub1"))
+				.Build();
+
+			//CHATHUB_STEP4
+			hubConnection.On<string, string>("ReceiveMessage2", (user, message) =>
+			{
+				string encodedMsg = $"{user}: {message}";
+				messages.Add(encodedMsg);
+				StateHasChanged();
+			});
 
 
-			////
-			////
-			///
+			//_hub.On<Message>("SendMessageToClient", async i => await OnMessageFromServer(i.Id, i.Message))
 
-			//int height = imgSharp.Height - 1;
-			//int width = imgSharp.Width - 1; //preivious -1
-			//for (int y = 0; y <= height; y++)
+			//EDGE_STEP4
+			hubConnection.On<int>("Edge_signalr2", (parameter1) =>
+			{
+				string encodedMsg = $"{parameter1}";
+				messages.Add(encodedMsg);
+				showerror = true;
+
+
+				////
+				////
+				///
+
+				//int height = imgSharp.Height - 1;
+				//int width = imgSharp.Width - 1; //preivious -1
+				//for (int y = 0; y <= height; y++)
+				//{
+				//	Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
+				//	for (int x = 0; x <= width; x++)
+				//	{
+				//		int red = imgSharp[x, y].R;
+				//		int green = imgSharp[x, y].G + 30;
+				//		int blue = imgSharp[x, y].B;
+				//		int alpha = imgSharp[x, y].A;
+
+				//		if (red > 255) { red = 255; }
+				//		else if (red < 0) { red = 0; }
+				//		if (green > 255) { green = 255; }
+				//		else if (green < 0) { green = 0; }
+				//		if (blue > 255) { blue = 255; }
+				//		else if (blue < 0) { blue = 0; }
+
+				//		byte red2 = (byte)red;
+				//		byte green2 = (byte)green;
+				//		byte blue2 = (byte)blue;
+				//		byte alpha2 = (byte)alpha;
+
+
+				//		pixelRowSpan[x] = new Rgba32(red2, green2, blue2, alpha2);
+				//	}
+				//}
+
+
+
+
+				if (displayImage == true)
+				{
+					showprocessing = true;
+					int height = imgSharp.Height - 1;
+					int width = imgSharp.Width - 1; //preivious -1
+
+					int[,] array_gx = new int[3, 3];
+					int[,] array_gy = new int[3, 3];
+
+
+					if (parameter1 == 0)
+					{
+						//sobel
+						array_gx[0, 0] = -1; array_gx[0, 1] = 0; array_gx[0, 2] = 1;
+						array_gx[1, 0] = -2; array_gx[1, 1] = 0; array_gx[1, 2] = 2;
+						array_gx[2, 0] = -1; array_gx[2, 1] = 0; array_gx[2, 2] = 1;
+						array_gy[0, 0] = -1; array_gy[0, 1] = -2; array_gy[0, 2] = -1;
+						array_gy[1, 0] = 0; array_gy[1, 1] = 0; array_gy[1, 2] = 0;
+						array_gy[2, 0] = 1; array_gy[2, 1] = 2; array_gy[2, 2] = 1;
+					}
+					else if (parameter1 == 1 || parameter1 == 2 || parameter1 == 3)
+					{
+						//alternative, prewitt?, more intense
+						array_gx[0, 0] = -2; array_gx[0, 1] = 0; array_gx[0, 2] = 2;
+						array_gx[1, 0] = -2; array_gx[1, 1] = 0; array_gx[1, 2] = 2;
+						array_gx[2, 0] = -2; array_gx[2, 1] = 0; array_gx[2, 2] = 2;
+						array_gy[0, 0] = -2; array_gy[0, 1] = -2; array_gy[0, 2] = -2;
+						array_gy[1, 0] = 0; array_gy[1, 1] = 0; array_gy[1, 2] = 0;
+						array_gy[2, 0] = 2; array_gy[2, 1] = 2; array_gy[2, 2] = 2;
+					}
+					else if (parameter1 == 4)
+					{
+						//alternative, prewitt?, more intense
+						array_gx[0, 0] = 5; array_gx[0, 1] = 5; array_gx[0, 2] = 5;
+						array_gx[1, 0] = -3; array_gx[1, 1] = 0; array_gx[1, 2] = -3;
+						array_gx[2, 0] = -3; array_gx[2, 1] = -3; array_gx[2, 2] = -3;
+						array_gy[0, 0] = 5; array_gy[0, 1] = -3; array_gy[0, 2] = -3;
+						array_gy[1, 0] = 5; array_gy[1, 1] = 0; array_gy[1, 2] = -3;
+						array_gy[2, 0] = 5; array_gy[2, 1] = -3; array_gy[2, 2] = -3;
+					}
+
+
+					//init
+					int val_Alpha = 0;
+					byte val_Alpha2 = 0;
+
+					int val_Blue = 0;
+					int val_Green = 0;
+					int val_Red = 0;
+
+					int Gx_sum_Blue = 0;
+					int Gx_sum_Green = 0;
+					int Gx_sum_Red = 0;
+
+					int Gy_sum_Blue = 0;
+					int Gy_sum_Green = 0;
+					int Gy_sum_Red = 0;
+
+					int Gxy_sum_final_Blue = 0;
+					int Gxy_sum_final_Green = 0;
+					int Gxy_sum_final_Red = 0;
+
+
+					for (int y = 0; y <= height; y++)
+					{
+						if (y == 0) { continue; }
+						if (y == height - 1) { continue; }
+						if (y == height) { continue; }
+						Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
+
+						for (int x = 0; x <= width; x++)
+						{
+							if (x == 0) { continue; }
+							if (x == width - 1) { continue; }
+							if (x == width) { continue; }
+
+							Gx_sum_Blue = 0;
+							Gx_sum_Green = 0;
+							Gx_sum_Red = 0;
+
+							Gy_sum_Blue = 0;
+							Gy_sum_Green = 0;
+							Gy_sum_Red = 0;
+
+							Gxy_sum_final_Blue = 0;
+							Gxy_sum_final_Green = 0;
+							Gxy_sum_final_Red = 0;
+
+							//// finding Gx and Gy
+							//// finding Gx and Gy
+							for (int r = 0; r < 3; r++)
+							{
+								for (int c = 0; c < 3; c++)
+								{
+									//fix this part, so it can work on any image on BS1 app
+									if (((y + (r - 1) >= 0) && (x + (c - 1) >= 0)) && ((y + (r - 1) <= height) && (x + (c - 1) <= width)))
+									{
+										int he = y + (r - 1);
+										int we = x + (c - 1);
+
+										//val_Blue = imgSharp[he, we].B;
+										//val_Green = imgSharp[he, we].G;
+										//val_Red = imgSharp[he, we].R;
+
+										val_Blue = imgSharp_original2[we, he].B;
+										val_Green = imgSharp_original2[we, he].G;
+										val_Red = imgSharp_original2[we, he].R;
+									}
+									//fix this part, so it can work on any image on BS1 app
+
+
+									// if outside the border (row)
+									if ((y + (r - 1) < 0) || (y + (r - 1) > (height - 1)))
+									{
+										val_Blue = 0;
+										val_Green = 0;
+										val_Red = 0;
+										//logprint_sum1++; //2400
+									}
+
+									// if outside the border (column)
+									// 400
+									else if ((x + (c - 1) < 0) || (x + (c - 1) > (width - 1)))
+									{
+										val_Blue = 0;
+										val_Green = 0;
+										val_Red = 0;
+										//logprint_sum1++; //3290
+									}
+
+									Gx_sum_Blue += val_Blue * array_gx[r, c];
+									Gx_sum_Green += val_Green * array_gx[r, c];
+									Gx_sum_Red += val_Red * array_gx[r, c];
+
+									Gy_sum_Blue += val_Blue * array_gy[r, c];
+									Gy_sum_Green += val_Green * array_gy[r, c];
+									Gy_sum_Red += val_Red * array_gy[r, c];
+
+								}
+							}
+							//// finding Gx and Gy
+							//// finding Gx and Gy
+
+
+
+							//store alpha for desired modification
+							val_Alpha = imgSharp[x, y].A;
+
+							Gxy_sum_final_Blue = (int)Math.Sqrt(((Math.Pow(Gx_sum_Blue, 2)) + (Math.Pow(Gy_sum_Blue, 2))));
+							Gxy_sum_final_Green = (int)(Math.Sqrt((Math.Pow(Gx_sum_Green, 2)) + (Math.Pow(Gy_sum_Green, 2))));
+							Gxy_sum_final_Red = (int)Math.Sqrt(((Math.Pow(Gx_sum_Red, 2)) + (Math.Pow(Gy_sum_Red, 2))));
+
+
+							////modification BEG
+							////modification BEG
+
+
+							//make weak white lines stronger (applies to black background/white line, non-invert) //way 2
+
+							double m1 = 1.33; //0.5 darker, 1 normal, 2 whiter //BUTTON/SLIDER HERE!!!!
+							if (parameter1 == 4 || parameter1 == 1) { m1 = 1; }
+							if (Gxy_sum_final_Blue >= 45 && Gxy_sum_final_Blue <= 160) { Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * m1); }
+							if (Gxy_sum_final_Green >= 45 && Gxy_sum_final_Green <= 160) { Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * m1); }
+							if (Gxy_sum_final_Red >= 45 && Gxy_sum_final_Red <= 160) { Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * m1); }
+							//make strong white lines weaker (applies to black background/white line, non-invert) //way 2
+							double m2 = 0.90; //0.90 //BUTTON/SLIDER HERE!!!
+							if (Gxy_sum_final_Blue >= 180 && Gxy_sum_final_Blue <= 230) { Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * m2); }
+							if (Gxy_sum_final_Green >= 180 && Gxy_sum_final_Green <= 230) { Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * m2); }
+							if (Gxy_sum_final_Red >= 180 && Gxy_sum_final_Red <= 230) { Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * m2); }
+
+
+							//ui idea
+							//idea: set a range (ex: 80-200) for weak white lines to get whiter
+							//idea: set another range (ex: 200-255) for strong white lines to get darker
+							////modification END
+							////modification END
+
+
+
+
+							//////custom color background
+							int cutoff = 15; //should try make a slider ouit of this //IDEA1 //make alpha=0 background //30, 45, 60, 75
+							if (parameter1 == 1) { cutoff = 60; }
+							if (Gxy_sum_final_Blue <= cutoff && Gxy_sum_final_Green <= cutoff && Gxy_sum_final_Red <= cutoff)
+							{
+
+								Gxy_sum_final_Blue = 0;
+								Gxy_sum_final_Green = 0;
+								Gxy_sum_final_Red = 0;
+							}
+							else
+							{
+								//if (Gxy_sum_final_Blue < cutoff) { Gxy_sum_final_Blue = cutoff; }
+								//if (Gxy_sum_final_Green < cutoff) { Gxy_sum_final_Green = cutoff; }
+								//if (Gxy_sum_final_Red < cutoff) { Gxy_sum_final_Red = cutoff; }
+								//Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * 1.33);
+								//Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * 1.33);
+								//Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * 1.33);
+							}
+							//OR..
+							//////..transparant (before invert)
+							//int cutoff = 128; //should try make a slider ouit of this //IDEA1 //make alpha=0 background //180 FOR TRANSPARRENCY
+							//if (Gxy_sum_final_Blue <= cutoff && Gxy_sum_final_Green <= cutoff && Gxy_sum_final_Red <= cutoff)
+							//{
+							//    val_Alpha = 0;
+							//}
+							//else
+							//{
+							//    //if (Gxy_sum_final_Blue < cutoff) { Gxy_sum_final_Blue = cutoff; }
+							//    //if (Gxy_sum_final_Green < cutoff) { Gxy_sum_final_Green = cutoff; }
+							//    //if (Gxy_sum_final_Red < cutoff) { Gxy_sum_final_Red = cutoff; }
+							//    Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * 1/0.20); //should make sliders out of these //IDEA2 ex: 100% = 1, 200% = 2
+							//    Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * 1/0.20);
+							//    Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * 1/0.20);
+							//}
+
+
+							//keep ARGB within 0-255
+							if (Gxy_sum_final_Blue > 255) { Gxy_sum_final_Blue = 255; }
+							if (Gxy_sum_final_Green > 255) { Gxy_sum_final_Green = 255; }
+							if (Gxy_sum_final_Red > 255) { Gxy_sum_final_Red = 255; }
+							if (Gxy_sum_final_Blue < 0) { Gxy_sum_final_Blue = 0; }
+							if (Gxy_sum_final_Green < 0) { Gxy_sum_final_Green = 0; }
+							if (Gxy_sum_final_Red < 0) { Gxy_sum_final_Red = 0; }
+
+
+							//modification BEG
+							//modification BEG
+							//INVERT
+							Gxy_sum_final_Red = 255 - Gxy_sum_final_Red;
+							Gxy_sum_final_Green = 255 - Gxy_sum_final_Green;
+							Gxy_sum_final_Blue = 255 - Gxy_sum_final_Blue;
+
+
+
+							//////////..transparant (after invert)
+							//int cutoff = 128; //should try make a slider ouit of this //IDEA1 //make alpha=0 background //180 FOR TRANSPARRENCY
+							//if (Gxy_sum_final_Blue >= cutoff && Gxy_sum_final_Blue >= cutoff && Gxy_sum_final_Blue >= cutoff)
+							//{
+							//    val_Alpha = 0;
+							//}
+							//else
+							//{
+							//    Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * 0.90); //should make sliders out of these //IDEA2 ex: 100% = 1, 200% = 2
+							//    Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * 0.90);
+							//    Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * 0.90);
+							//    //if (Gxy_sum_final_Blue > cutoff) { Gxy_sum_final_Blue = cutoff; }
+							//    //if (Gxy_sum_final_Green > cutoff) { Gxy_sum_final_Green = cutoff; }
+							//    //if (Gxy_sum_final_Red > cutoff) { Gxy_sum_final_Red = cutoff; }
+							//}
+
+
+
+
+							//No BW and/or shade way 0
+
+							if (parameter1 == 1 || parameter1 == 0)
+							{
+								////Make BW only way 1
+								int bwcolor = (Gxy_sum_final_Blue + Gxy_sum_final_Green + Gxy_sum_final_Red) / 3;
+								Gxy_sum_final_Blue = bwcolor;
+								Gxy_sum_final_Green = bwcolor;
+								Gxy_sum_final_Red = bwcolor;
+							}
+
+							//OR
+							else if (parameter1 == 2)
+							{
+								//Make BW + shade way 2
+								int bwcolor = (Gxy_sum_final_Blue + Gxy_sum_final_Green + Gxy_sum_final_Red) / 3;
+								int bwcolor2 = (int)(((imgSharp_original2[x, y].R + imgSharp_original2[x, y].G + imgSharp_original2[x, y].B) / 3) * 1.0);
+								//if (bwcolor2 > 255) { bwcolor = 255; }
+								//if (bwcolor2 < 0) { bwcolor = 0; }
+								//add shade
+								if (bwcolor2 <= bwcolor && bwcolor2 <= 230)
+								{
+									Gxy_sum_final_Blue = bwcolor2;
+									Gxy_sum_final_Green = bwcolor2;
+									Gxy_sum_final_Red = bwcolor2;
+								}
+								else
+								{
+									Gxy_sum_final_Blue = bwcolor;
+									Gxy_sum_final_Green = bwcolor;
+									Gxy_sum_final_Red = bwcolor;
+								}
+							}
+
+
+							else if (parameter1 == 3)
+							{
+
+								////Make shade way 3.2
+								int bwcolor = (Gxy_sum_final_Blue + Gxy_sum_final_Green + Gxy_sum_final_Red) / 3;
+								int bwcolor2 = (int)(((imgSharp_original2[x, y].R + imgSharp_original2[x, y].G + imgSharp_original2[x, y].B) / 3) * 1.0);
+								//if (bwcolor2 > 255) { bwcolor = 255; }
+								//if (bwcolor2 < 0) { bwcolor = 0; }
+								//add shade
+								if (bwcolor2 <= bwcolor && bwcolor2 <= 255)
+								{
+									Gxy_sum_final_Blue = imgSharp_original2[x, y].B;
+									Gxy_sum_final_Green = imgSharp_original2[x, y].G;
+									Gxy_sum_final_Red = imgSharp_original2[x, y].R;
+								}
+								else
+								{
+									Gxy_sum_final_Blue = bwcolor;
+									Gxy_sum_final_Green = bwcolor;
+									Gxy_sum_final_Red = bwcolor;
+								}
+							}
+
+							else if (parameter1 == 4)
+							{
+								//ray effect way 4 = from way 1, grayscale with color lines
+								////Make BW
+								int bwcolor = (Gxy_sum_final_Blue + Gxy_sum_final_Green + Gxy_sum_final_Red) / 3;
+								Gxy_sum_final_Blue = bwcolor;
+								Gxy_sum_final_Green = bwcolor;
+								Gxy_sum_final_Red = bwcolor;
+
+								int bwcolor2 = (((imgSharp_original2[x, y].R + imgSharp_original2[x, y].G + imgSharp_original2[x, y].B) / 3));
+								//add shade
+								if (bwcolor2 <= bwcolor)
+								{
+									Gxy_sum_final_Blue = bwcolor2;
+
+
+								}
+								Gxy_sum_final_Green = bwcolor2;
+								Gxy_sum_final_Red = bwcolor2;
+
+
+							}
+
+
+
+
+							//modification END
+							//modification END
+
+							//keep ARGB within 0-255
+							if (Gxy_sum_final_Blue > 255) { Gxy_sum_final_Blue = 255; }
+							if (Gxy_sum_final_Green > 255) { Gxy_sum_final_Green = 255; }
+							if (Gxy_sum_final_Red > 255) { Gxy_sum_final_Red = 255; }
+							if (Gxy_sum_final_Blue < 0) { Gxy_sum_final_Blue = 0; }
+							if (Gxy_sum_final_Green < 0) { Gxy_sum_final_Green = 0; }
+							if (Gxy_sum_final_Red < 0) { Gxy_sum_final_Red = 0; }
+
+							//recreate with byte variables cuz ImageSharp
+							byte Gxy_sum_final_Red2 = (byte)Gxy_sum_final_Red;
+							byte Gxy_sum_final_Green2 = (byte)Gxy_sum_final_Green;
+							byte Gxy_sum_final_Blue2 = (byte)Gxy_sum_final_Blue;
+							val_Alpha2 = (byte)val_Alpha;
+
+							pixelRowSpan[x] = new Rgba32(Gxy_sum_final_Red2, Gxy_sum_final_Green2, Gxy_sum_final_Blue2, val_Alpha2);
+						}
+					}
+				}
+				showprocessing = false;
+				//
+				//
+
+				StateHasChanged();
+
+				//?
+
+			});
+
+			////BUTTON1_STEP4
+			//hubConnection.On<InputFileChangeEventArgs>("UploadFile_2", (e) =>
 			//{
-			//	Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
-			//	for (int x = 0; x <= width; x++)
-			//	{
-			//		int red = imgSharp[x, y].R;
-			//		int green = imgSharp[x, y].G + 30;
-			//		int blue = imgSharp[x, y].B;
-			//		int alpha = imgSharp[x, y].A;
+			//	string encodedMsg = "ee";
+			//	messages.Add(encodedMsg);
+			//	showerror = true;
+			//	StateHasChanged();
+			//});
 
-			//		if (red > 255) { red = 255; }
-			//		else if (red < 0) { red = 0; }
-			//		if (green > 255) { green = 255; }
-			//		else if (green < 0) { green = 0; }
-			//		if (blue > 255) { blue = 255; }
-			//		else if (blue < 0) { blue = 0; }
+			await hubConnection.StartAsync();
+		}
 
-			//		byte red2 = (byte)red;
-			//		byte green2 = (byte)green;
-			//		byte blue2 = (byte)blue;
-			//		byte alpha2 = (byte)alpha;
+		//CHATHUB_STEP1
+		async Task Send() =>
+			await hubConnection.SendAsync("SendMessage1", userInput, messageInput);
+
+		//EDGE_STEP1
+		async Task Edge_signalr0(int i) =>
+			await hubConnection.SendAsync("Edge_signalr1", i);
 
 
-			//		pixelRowSpan[x] = new Rgba32(red2, green2, blue2, alpha2);
-			//	}
-			//}
+		//IMGSHARP_STEP1
+		async Task UploadFile(InputFileChangeEventArgs e) =>
+		await hubConnection.SendAsync("UploadFile_1", e);
 
 
 
+		public bool IsConnected =>
+	hubConnection.State == HubConnectionState.Connected;
 
+
+		public async ValueTask DisposeAsync()
+		{
+			await hubConnection.DisposeAsync();
+		}
+
+
+
+
+
+
+
+		async Task UploadFile_original(InputFileChangeEventArgs e)
+		{
+			displayImage = false;
+			showerror = false;
+			showloading = true;
+			IBrowserFile imageFile = e.File;
+
+			if (imageFile != null) // blazorinputfile
+			{
+				int maxAllowedSize = 15000000;
+				await using MemoryStream ms = new MemoryStream();
+				await imageFile.OpenReadStream(maxAllowedSize).CopyToAsync(ms);
+
+				try
+				{
+					imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
+					imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
+					imgSharp_original2 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
+
+					_ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
+
+					status = $"Finished loading {imageFile.Size} bytes from {imageFile.Name}";
+
+					showloading = false;
+					displayImage = true;
+					showerror = false;
+				}
+				catch (Exception x)
+				{
+					Error = $"File is not an image (BMP/GIF/JPG/JPEG/PNG/TGA). Try again.";
+					showerror = true;
+					showloading = false;
+				}
+			}
+			else
+			{
+				Error = $"Unknown error occurred. Try again.";
+				showerror = true;
+				showloading = false;
+			}
+		}
+
+
+
+		//WIP, use way 2,
+		//works on small image
+		void Edge(int parameter1)
+		{
 			if (displayImage == true)
 			{
 				showprocessing = true;
 				int height = imgSharp.Height - 1;
 				int width = imgSharp.Width - 1; //preivious -1
 
+
 				int[,] array_gx = new int[3, 3];
 				int[,] array_gy = new int[3, 3];
 
+
+				//prewitt
 
 				if (parameter1 == 0)
 				{
@@ -253,6 +719,9 @@
 				int Gxy_sum_final_Green = 0;
 				int Gxy_sum_final_Red = 0;
 
+				//int logprint_sum1 = 0;
+
+
 
 				for (int y = 0; y <= height; y++)
 				{
@@ -260,7 +729,6 @@
 					if (y == height - 1) { continue; }
 					if (y == height) { continue; }
 					Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
-
 					for (int x = 0; x <= width; x++)
 					{
 						if (x == 0) { continue; }
@@ -367,6 +835,10 @@
 						//idea: set another range (ex: 200-255) for strong white lines to get darker
 						////modification END
 						////modification END
+
+
+
+
 
 
 
@@ -532,6 +1004,7 @@
 						//modification END
 						//modification END
 
+
 						//keep ARGB within 0-255
 						if (Gxy_sum_final_Blue > 255) { Gxy_sum_final_Blue = 255; }
 						if (Gxy_sum_final_Green > 255) { Gxy_sum_final_Green = 255; }
@@ -540,497 +1013,29 @@
 						if (Gxy_sum_final_Green < 0) { Gxy_sum_final_Green = 0; }
 						if (Gxy_sum_final_Red < 0) { Gxy_sum_final_Red = 0; }
 
+
+
+
+
+
 						//recreate with byte variables cuz ImageSharp
 						byte Gxy_sum_final_Red2 = (byte)Gxy_sum_final_Red;
 						byte Gxy_sum_final_Green2 = (byte)Gxy_sum_final_Green;
 						byte Gxy_sum_final_Blue2 = (byte)Gxy_sum_final_Blue;
 						val_Alpha2 = (byte)val_Alpha;
 
+
+
+
+
 						pixelRowSpan[x] = new Rgba32(Gxy_sum_final_Red2, Gxy_sum_final_Green2, Gxy_sum_final_Blue2, val_Alpha2);
 					}
 				}
 			}
+
+
+
 			showprocessing = false;
-			//
-			//
-
-			StateHasChanged();
-
-			//?
-
-		});
-
-		////BUTTON1_STEP4
-		//hubConnection.On<InputFileChangeEventArgs>("UploadFile_2", (e) =>
-		//{
-		//	string encodedMsg = "ee";
-		//	messages.Add(encodedMsg);
-		//	showerror = true;
-		//	StateHasChanged();
-		//});
-
-		await hubConnection.StartAsync();
-	}
-
-	//CHATHUB_STEP1
-	async Task Send() =>
-		await hubConnection.SendAsync("SendMessage1", userInput, messageInput);
-
-	//EDGE_STEP1
-	async Task Edge_signalr0(int i) =>
-		await hubConnection.SendAsync("Edge_signalr1", i);
-
-
-	//IMGSHARP_STEP1
-	async Task UploadFile(InputFileChangeEventArgs e) =>
-	await hubConnection.SendAsync("UploadFile_1", e);
-
-
-
-	public bool IsConnected =>
-hubConnection.State == HubConnectionState.Connected;
-
-
-	public async ValueTask DisposeAsync()
-	{
-		await hubConnection.DisposeAsync();
-	}
-
-
-
-
-
-
-
-	async Task UploadFile_original(InputFileChangeEventArgs e)
-	{
-		displayImage = false;
-		showerror = false;
-		showloading = true;
-		IBrowserFile imageFile = e.File;
-
-		if (imageFile != null) // blazorinputfile
-		{
-			int maxAllowedSize = 15000000;
-			await using MemoryStream ms = new MemoryStream();
-			await imageFile.OpenReadStream(maxAllowedSize).CopyToAsync(ms);
-
-			try
-			{
-				imgSharp = Image.Load<Rgba32>(ms.ToArray(), out IIF1); // imagesharp
-				imgSharp_original1 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
-				imgSharp_original2 = Image.Load<Rgba32>(ms.ToArray(), out IIF1);
-
-				_ip = new ImageProcessing_CS(imgSharp, IIF1); // imagesharp, image for img src
-
-				status = $"Finished loading {imageFile.Size} bytes from {imageFile.Name}";
-
-				showloading = false;
-				displayImage = true;
-				showerror = false;
-			}
-			catch (Exception x)
-			{
-				Error = $"File is not an image (BMP/GIF/JPG/JPEG/PNG/TGA). Try again.";
-				showerror = true;
-				showloading = false;
-			}
-		}
-		else
-		{
-			Error = $"Unknown error occurred. Try again.";
-			showerror = true;
-			showloading = false;
 		}
 	}
-
-
-
-	//WIP, use way 2,
-	//works on small image
-	void Edge(int parameter1)
-	{
-		if (displayImage == true)
-		{
-			showprocessing = true;
-			int height = imgSharp.Height - 1;
-			int width = imgSharp.Width - 1; //preivious -1
-
-
-			int[,] array_gx = new int[3, 3];
-			int[,] array_gy = new int[3, 3];
-
-
-			//prewitt
-
-			if (parameter1 == 0)
-			{
-				//sobel
-				array_gx[0, 0] = -1; array_gx[0, 1] = 0; array_gx[0, 2] = 1;
-				array_gx[1, 0] = -2; array_gx[1, 1] = 0; array_gx[1, 2] = 2;
-				array_gx[2, 0] = -1; array_gx[2, 1] = 0; array_gx[2, 2] = 1;
-				array_gy[0, 0] = -1; array_gy[0, 1] = -2; array_gy[0, 2] = -1;
-				array_gy[1, 0] = 0; array_gy[1, 1] = 0; array_gy[1, 2] = 0;
-				array_gy[2, 0] = 1; array_gy[2, 1] = 2; array_gy[2, 2] = 1;
-			}
-			else if (parameter1 == 1 || parameter1 == 2 || parameter1 == 3)
-			{
-				//alternative, prewitt?, more intense
-				array_gx[0, 0] = -2; array_gx[0, 1] = 0; array_gx[0, 2] = 2;
-				array_gx[1, 0] = -2; array_gx[1, 1] = 0; array_gx[1, 2] = 2;
-				array_gx[2, 0] = -2; array_gx[2, 1] = 0; array_gx[2, 2] = 2;
-				array_gy[0, 0] = -2; array_gy[0, 1] = -2; array_gy[0, 2] = -2;
-				array_gy[1, 0] = 0; array_gy[1, 1] = 0; array_gy[1, 2] = 0;
-				array_gy[2, 0] = 2; array_gy[2, 1] = 2; array_gy[2, 2] = 2;
-			}
-			else if (parameter1 == 4)
-			{
-				//alternative, prewitt?, more intense
-				array_gx[0, 0] = 5; array_gx[0, 1] = 5; array_gx[0, 2] = 5;
-				array_gx[1, 0] = -3; array_gx[1, 1] = 0; array_gx[1, 2] = -3;
-				array_gx[2, 0] = -3; array_gx[2, 1] = -3; array_gx[2, 2] = -3;
-				array_gy[0, 0] = 5; array_gy[0, 1] = -3; array_gy[0, 2] = -3;
-				array_gy[1, 0] = 5; array_gy[1, 1] = 0; array_gy[1, 2] = -3;
-				array_gy[2, 0] = 5; array_gy[2, 1] = -3; array_gy[2, 2] = -3;
-			}
-
-
-			//init
-			int val_Alpha = 0;
-			byte val_Alpha2 = 0;
-
-			int val_Blue = 0;
-			int val_Green = 0;
-			int val_Red = 0;
-
-			int Gx_sum_Blue = 0;
-			int Gx_sum_Green = 0;
-			int Gx_sum_Red = 0;
-
-			int Gy_sum_Blue = 0;
-			int Gy_sum_Green = 0;
-			int Gy_sum_Red = 0;
-
-			int Gxy_sum_final_Blue = 0;
-			int Gxy_sum_final_Green = 0;
-			int Gxy_sum_final_Red = 0;
-
-			//int logprint_sum1 = 0;
-
-
-
-			for (int y = 0; y <= height; y++)
-			{
-				if (y == 0) { continue; }
-				if (y == height - 1) { continue; }
-				if (y == height) { continue; }
-				Span<Rgba32> pixelRowSpan = imgSharp.GetPixelRowSpan(y);
-				for (int x = 0; x <= width; x++)
-				{
-					if (x == 0) { continue; }
-					if (x == width - 1) { continue; }
-					if (x == width) { continue; }
-
-					Gx_sum_Blue = 0;
-					Gx_sum_Green = 0;
-					Gx_sum_Red = 0;
-
-					Gy_sum_Blue = 0;
-					Gy_sum_Green = 0;
-					Gy_sum_Red = 0;
-
-					Gxy_sum_final_Blue = 0;
-					Gxy_sum_final_Green = 0;
-					Gxy_sum_final_Red = 0;
-
-					//// finding Gx and Gy
-					//// finding Gx and Gy
-					for (int r = 0; r < 3; r++)
-					{
-						for (int c = 0; c < 3; c++)
-						{
-							//fix this part, so it can work on any image on BS1 app
-							if (((y + (r - 1) >= 0) && (x + (c - 1) >= 0)) && ((y + (r - 1) <= height) && (x + (c - 1) <= width)))
-							{
-								int he = y + (r - 1);
-								int we = x + (c - 1);
-
-								//val_Blue = imgSharp[he, we].B;
-								//val_Green = imgSharp[he, we].G;
-								//val_Red = imgSharp[he, we].R;
-
-								val_Blue = imgSharp_original2[we, he].B;
-								val_Green = imgSharp_original2[we, he].G;
-								val_Red = imgSharp_original2[we, he].R;
-							}
-							//fix this part, so it can work on any image on BS1 app
-
-
-							// if outside the border (row)
-							if ((y + (r - 1) < 0) || (y + (r - 1) > (height - 1)))
-							{
-								val_Blue = 0;
-								val_Green = 0;
-								val_Red = 0;
-								//logprint_sum1++; //2400
-							}
-
-							// if outside the border (column)
-							// 400
-							else if ((x + (c - 1) < 0) || (x + (c - 1) > (width - 1)))
-							{
-								val_Blue = 0;
-								val_Green = 0;
-								val_Red = 0;
-								//logprint_sum1++; //3290
-							}
-
-							Gx_sum_Blue += val_Blue * array_gx[r, c];
-							Gx_sum_Green += val_Green * array_gx[r, c];
-							Gx_sum_Red += val_Red * array_gx[r, c];
-
-							Gy_sum_Blue += val_Blue * array_gy[r, c];
-							Gy_sum_Green += val_Green * array_gy[r, c];
-							Gy_sum_Red += val_Red * array_gy[r, c];
-
-						}
-					}
-					//// finding Gx and Gy
-					//// finding Gx and Gy
-
-
-
-					//store alpha for desired modification
-					val_Alpha = imgSharp[x, y].A;
-
-					Gxy_sum_final_Blue = (int)Math.Sqrt(((Math.Pow(Gx_sum_Blue, 2)) + (Math.Pow(Gy_sum_Blue, 2))));
-					Gxy_sum_final_Green = (int)(Math.Sqrt((Math.Pow(Gx_sum_Green, 2)) + (Math.Pow(Gy_sum_Green, 2))));
-					Gxy_sum_final_Red = (int)Math.Sqrt(((Math.Pow(Gx_sum_Red, 2)) + (Math.Pow(Gy_sum_Red, 2))));
-
-
-					////modification BEG
-					////modification BEG
-
-
-					//make weak white lines stronger (applies to black background/white line, non-invert) //way 2
-
-					double m1 = 1.33; //0.5 darker, 1 normal, 2 whiter //BUTTON/SLIDER HERE!!!!
-					if (parameter1 == 4 || parameter1 == 1) { m1 = 1; }
-					if (Gxy_sum_final_Blue >= 45 && Gxy_sum_final_Blue <= 160) { Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * m1); }
-					if (Gxy_sum_final_Green >= 45 && Gxy_sum_final_Green <= 160) { Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * m1); }
-					if (Gxy_sum_final_Red >= 45 && Gxy_sum_final_Red <= 160) { Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * m1); }
-					//make strong white lines weaker (applies to black background/white line, non-invert) //way 2
-					double m2 = 0.90; //0.90 //BUTTON/SLIDER HERE!!!
-					if (Gxy_sum_final_Blue >= 180 && Gxy_sum_final_Blue <= 230) { Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * m2); }
-					if (Gxy_sum_final_Green >= 180 && Gxy_sum_final_Green <= 230) { Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * m2); }
-					if (Gxy_sum_final_Red >= 180 && Gxy_sum_final_Red <= 230) { Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * m2); }
-
-
-					//ui idea
-					//idea: set a range (ex: 80-200) for weak white lines to get whiter
-					//idea: set another range (ex: 200-255) for strong white lines to get darker
-					////modification END
-					////modification END
-
-
-
-
-
-
-
-
-					//////custom color background
-					int cutoff = 15; //should try make a slider ouit of this //IDEA1 //make alpha=0 background //30, 45, 60, 75
-					if (parameter1 == 1) { cutoff = 60; }
-					if (Gxy_sum_final_Blue <= cutoff && Gxy_sum_final_Green <= cutoff && Gxy_sum_final_Red <= cutoff)
-					{
-
-						Gxy_sum_final_Blue = 0;
-						Gxy_sum_final_Green = 0;
-						Gxy_sum_final_Red = 0;
-					}
-					else
-					{
-						//if (Gxy_sum_final_Blue < cutoff) { Gxy_sum_final_Blue = cutoff; }
-						//if (Gxy_sum_final_Green < cutoff) { Gxy_sum_final_Green = cutoff; }
-						//if (Gxy_sum_final_Red < cutoff) { Gxy_sum_final_Red = cutoff; }
-						//Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * 1.33);
-						//Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * 1.33);
-						//Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * 1.33);
-					}
-					//OR..
-					//////..transparant (before invert)
-					//int cutoff = 128; //should try make a slider ouit of this //IDEA1 //make alpha=0 background //180 FOR TRANSPARRENCY
-					//if (Gxy_sum_final_Blue <= cutoff && Gxy_sum_final_Green <= cutoff && Gxy_sum_final_Red <= cutoff)
-					//{
-					//    val_Alpha = 0;
-					//}
-					//else
-					//{
-					//    //if (Gxy_sum_final_Blue < cutoff) { Gxy_sum_final_Blue = cutoff; }
-					//    //if (Gxy_sum_final_Green < cutoff) { Gxy_sum_final_Green = cutoff; }
-					//    //if (Gxy_sum_final_Red < cutoff) { Gxy_sum_final_Red = cutoff; }
-					//    Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * 1/0.20); //should make sliders out of these //IDEA2 ex: 100% = 1, 200% = 2
-					//    Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * 1/0.20);
-					//    Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * 1/0.20);
-					//}
-
-
-					//keep ARGB within 0-255
-					if (Gxy_sum_final_Blue > 255) { Gxy_sum_final_Blue = 255; }
-					if (Gxy_sum_final_Green > 255) { Gxy_sum_final_Green = 255; }
-					if (Gxy_sum_final_Red > 255) { Gxy_sum_final_Red = 255; }
-					if (Gxy_sum_final_Blue < 0) { Gxy_sum_final_Blue = 0; }
-					if (Gxy_sum_final_Green < 0) { Gxy_sum_final_Green = 0; }
-					if (Gxy_sum_final_Red < 0) { Gxy_sum_final_Red = 0; }
-
-
-					//modification BEG
-					//modification BEG
-					//INVERT
-					Gxy_sum_final_Red = 255 - Gxy_sum_final_Red;
-					Gxy_sum_final_Green = 255 - Gxy_sum_final_Green;
-					Gxy_sum_final_Blue = 255 - Gxy_sum_final_Blue;
-
-
-
-					//////////..transparant (after invert)
-					//int cutoff = 128; //should try make a slider ouit of this //IDEA1 //make alpha=0 background //180 FOR TRANSPARRENCY
-					//if (Gxy_sum_final_Blue >= cutoff && Gxy_sum_final_Blue >= cutoff && Gxy_sum_final_Blue >= cutoff)
-					//{
-					//    val_Alpha = 0;
-					//}
-					//else
-					//{
-					//    Gxy_sum_final_Blue = (int)(Gxy_sum_final_Blue * 0.90); //should make sliders out of these //IDEA2 ex: 100% = 1, 200% = 2
-					//    Gxy_sum_final_Green = (int)(Gxy_sum_final_Green * 0.90);
-					//    Gxy_sum_final_Red = (int)(Gxy_sum_final_Red * 0.90);
-					//    //if (Gxy_sum_final_Blue > cutoff) { Gxy_sum_final_Blue = cutoff; }
-					//    //if (Gxy_sum_final_Green > cutoff) { Gxy_sum_final_Green = cutoff; }
-					//    //if (Gxy_sum_final_Red > cutoff) { Gxy_sum_final_Red = cutoff; }
-					//}
-
-
-
-
-					//No BW and/or shade way 0
-
-					if (parameter1 == 1 || parameter1 == 0)
-					{
-						////Make BW only way 1
-						int bwcolor = (Gxy_sum_final_Blue + Gxy_sum_final_Green + Gxy_sum_final_Red) / 3;
-						Gxy_sum_final_Blue = bwcolor;
-						Gxy_sum_final_Green = bwcolor;
-						Gxy_sum_final_Red = bwcolor;
-					}
-
-					//OR
-					else if (parameter1 == 2)
-					{
-						//Make BW + shade way 2
-						int bwcolor = (Gxy_sum_final_Blue + Gxy_sum_final_Green + Gxy_sum_final_Red) / 3;
-						int bwcolor2 = (int)(((imgSharp_original2[x, y].R + imgSharp_original2[x, y].G + imgSharp_original2[x, y].B) / 3) * 1.0);
-						//if (bwcolor2 > 255) { bwcolor = 255; }
-						//if (bwcolor2 < 0) { bwcolor = 0; }
-						//add shade
-						if (bwcolor2 <= bwcolor && bwcolor2 <= 230)
-						{
-							Gxy_sum_final_Blue = bwcolor2;
-							Gxy_sum_final_Green = bwcolor2;
-							Gxy_sum_final_Red = bwcolor2;
-						}
-						else
-						{
-							Gxy_sum_final_Blue = bwcolor;
-							Gxy_sum_final_Green = bwcolor;
-							Gxy_sum_final_Red = bwcolor;
-						}
-					}
-
-
-					else if (parameter1 == 3)
-					{
-
-						////Make shade way 3.2
-						int bwcolor = (Gxy_sum_final_Blue + Gxy_sum_final_Green + Gxy_sum_final_Red) / 3;
-						int bwcolor2 = (int)(((imgSharp_original2[x, y].R + imgSharp_original2[x, y].G + imgSharp_original2[x, y].B) / 3) * 1.0);
-						//if (bwcolor2 > 255) { bwcolor = 255; }
-						//if (bwcolor2 < 0) { bwcolor = 0; }
-						//add shade
-						if (bwcolor2 <= bwcolor && bwcolor2 <= 255)
-						{
-							Gxy_sum_final_Blue = imgSharp_original2[x, y].B;
-							Gxy_sum_final_Green = imgSharp_original2[x, y].G;
-							Gxy_sum_final_Red = imgSharp_original2[x, y].R;
-						}
-						else
-						{
-							Gxy_sum_final_Blue = bwcolor;
-							Gxy_sum_final_Green = bwcolor;
-							Gxy_sum_final_Red = bwcolor;
-						}
-					}
-
-					else if (parameter1 == 4)
-					{
-						//ray effect way 4 = from way 1, grayscale with color lines
-						////Make BW
-						int bwcolor = (Gxy_sum_final_Blue + Gxy_sum_final_Green + Gxy_sum_final_Red) / 3;
-						Gxy_sum_final_Blue = bwcolor;
-						Gxy_sum_final_Green = bwcolor;
-						Gxy_sum_final_Red = bwcolor;
-
-						int bwcolor2 = (((imgSharp_original2[x, y].R + imgSharp_original2[x, y].G + imgSharp_original2[x, y].B) / 3));
-						//add shade
-						if (bwcolor2 <= bwcolor)
-						{
-							Gxy_sum_final_Blue = bwcolor2;
-
-
-						}
-						Gxy_sum_final_Green = bwcolor2;
-						Gxy_sum_final_Red = bwcolor2;
-
-
-					}
-
-
-
-
-					//modification END
-					//modification END
-
-
-					//keep ARGB within 0-255
-					if (Gxy_sum_final_Blue > 255) { Gxy_sum_final_Blue = 255; }
-					if (Gxy_sum_final_Green > 255) { Gxy_sum_final_Green = 255; }
-					if (Gxy_sum_final_Red > 255) { Gxy_sum_final_Red = 255; }
-					if (Gxy_sum_final_Blue < 0) { Gxy_sum_final_Blue = 0; }
-					if (Gxy_sum_final_Green < 0) { Gxy_sum_final_Green = 0; }
-					if (Gxy_sum_final_Red < 0) { Gxy_sum_final_Red = 0; }
-
-
-
-
-
-
-					//recreate with byte variables cuz ImageSharp
-					byte Gxy_sum_final_Red2 = (byte)Gxy_sum_final_Red;
-					byte Gxy_sum_final_Green2 = (byte)Gxy_sum_final_Green;
-					byte Gxy_sum_final_Blue2 = (byte)Gxy_sum_final_Blue;
-					val_Alpha2 = (byte)val_Alpha;
-
-
-
-
-
-					pixelRowSpan[x] = new Rgba32(Gxy_sum_final_Red2, Gxy_sum_final_Green2, Gxy_sum_final_Blue2, val_Alpha2);
-				}
-			}
-		}
-
-
-
-		showprocessing = false;
-	}
-}
+	-->
