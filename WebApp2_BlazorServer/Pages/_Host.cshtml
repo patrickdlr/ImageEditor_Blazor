@@ -46,6 +46,10 @@
 			document.getElementById('slider_Brightness').value = 0;
 			document.getElementById('text_Brightness').value = 0;
 		};
+		window.JS_resetsliderpositionandtextvalue_Opacity = () => {
+			document.getElementById('slider_Opacity').value = 0;
+			document.getElementById('text_Opacity').value = 0;
+		};
 		window.JS_resetsliderpositionandtextvalue_Red = () => {
 			document.getElementById('slider_Red').value = 0;
 			document.getElementById('text_Red').value = 0;
@@ -69,6 +73,10 @@
 		window.JS_changesliderpositionandtextvalue_Brightness = (n) => {
 			document.getElementById('slider_Brightness').value = n;
 			document.getElementById('text_Brightness').value = n;
+		};
+		window.JS_changesliderpositionandtextvalue_Opacity = (n) => {
+			document.getElementById('slider_Opacity').value = n;
+			document.getElementById('text_Opacity').value = n;
 		};
 		window.JS_changesliderpositionandtextvalue_Red = (n) => {
 			document.getElementById("slider_Red").value = n;
@@ -154,5 +162,7 @@
             })
         );
 	</script>*@
+
+	
 </body>
 </html>
